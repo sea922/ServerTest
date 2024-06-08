@@ -5,28 +5,22 @@ const Sequelize = require("sequelize");
 const constant = require("../../utils/constant.utils");
 
 module.exports = (database, DataTypes) => {
-  class TransactionHistory extends Sequelize.Model {
-    // You can define associations with other models here
+  class SystemInventory extends Sequelize.Model {
+    // initiate associate with other models (automatically called in ../models/index.js)
     static associate(models) {
-      // Define associations if needed
-      models.TransactionHistory.belongsTo(models.Player, {
-        as: "player",
-        foreignKey: "player_id",
-      });
-      models.TransactionHistory.belongsTo(models.Item, {
+      models.SystemInventory.belongsTo(models.Item, {
         as: "item",
         foreignKey: "item_id",
       });
     }
   }
 
-  TransactionHistory.init(
+  SystemInventory.init(
     {
       id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
         autoIncrement: true,
-        allowNull: false,
       },
       player_id: {
         type: DataTypes.BIGINT,
@@ -36,17 +30,21 @@ module.exports = (database, DataTypes) => {
         type: DataTypes.BIGINT,
         allowNull: false,
       },
-      quantity_change: {
+      price: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      previous_quantity: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+      createdBy: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
       },
-      current_quantity: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+      updatedBy: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+      },
+      deletedBy: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
       },
       createdAt: {
         type: DataTypes.DATE, // or Sequelize.DataTypes.DATE,
@@ -58,13 +56,16 @@ module.exports = (database, DataTypes) => {
         allowNull: true,
         defaultValue: Sequelize.NOW,
       },
+      deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
     },
     {
       sequelize: database,
-      tableName: "tbl_transaction_history",
-      timestamps: false,
+      tableName: "tbl_system_inventory",
     }
   );
 
-  return TransactionHistory;
+  return SystemInventory;
 };

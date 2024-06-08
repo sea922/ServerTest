@@ -20,7 +20,7 @@ module.exports = {
         type: Sequelize.DataTypes.BIGINT,
         allowNull: false,
       },
-      change: {
+      quantity_change: {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
       },

@@ -12,6 +12,14 @@ module.exports = (database, DataTypes) => {
         as: "transactions",
         foreignKey: "item_id",
       });
+      models.Item.hasMany(models.PlayerInventory, {
+        as: "list_player_items",
+        foreignKey: "item_id",
+      });
+      models.Item.hasMany(models.SystemInventory, {
+        as: "list_system_items",
+        foreignKey: "item_id",
+      });
     }
   }
 
@@ -43,10 +51,6 @@ module.exports = (database, DataTypes) => {
         },
         type: {
           type: DataTypes.STRING(64),
-          allowNull: true,
-        },
-        quantity: {
-          type: DataTypes.BIGINT,
           allowNull: true,
         },
         deleted: {

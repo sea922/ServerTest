@@ -8,10 +8,14 @@ module.exports = (database, DataTypes) => {
   class PlayerInventory extends Sequelize.Model {
     // initiate associate with other models (automatically called in ../models/index.js)
     static associate(models) {
-      // models.Item.hasMany(models.TransactionHistory, {
-      //   as: "listItem",
-      //   foreignKey: "item_id",
-      // });
+      models.PlayerInventory.belongsTo(models.Player, {
+        as: "player",
+        foreignKey: "player_id",
+      });
+      models.PlayerInventory.belongsTo(models.Item, {
+        as: "item",
+        foreignKey: "item_id",
+      });
     }
   }
 
@@ -31,16 +35,38 @@ module.exports = (database, DataTypes) => {
         allowNull: false,
       },
       quantity: {
-        type: DataTypes.BIGINT,
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
-      created_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
+      price: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
       },
-      updated_at: {
+      createdBy: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+      },
+      updatedBy: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+      },
+      deletedBy: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+      },
+      createdAt: {
+        type: DataTypes.DATE, // or Sequelize.DataTypes.DATE,
+        allowNull: true,
+        defaultValue: Sequelize.NOW,
+      },
+      updatedAt: {
         type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
+        allowNull: true,
+        defaultValue: Sequelize.NOW,
+      },
+      deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
       },
     },
     {

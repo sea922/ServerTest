@@ -9,7 +9,7 @@ module.exports = {
       {
         player_id: 1,
         item_id: 1,
-        change: 5,
+        quantity_change: 5,
         previous_quantity: 0,
         current_quantity: 5,
         createdAt: new Date(),
@@ -18,7 +18,7 @@ module.exports = {
       {
         player_id: 2,
         item_id: 2,
-        change: 3,
+        quantity_change: 3,
         previous_quantity: 0,
         current_quantity: 3,
         createdAt: new Date(),
@@ -27,7 +27,7 @@ module.exports = {
       {
         player_id: 3,
         item_id: 1,
-        change: 2,
+        quantity_change: 2,
         previous_quantity: 0,
         current_quantity: 2,
         createdAt: new Date(),

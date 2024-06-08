@@ -11,7 +11,6 @@ module.exports = {
         name: "Sword",
         type: "Weapon",
         description: "A sharp blade for combat.",
-        quantity: 10,
         metadata: JSON.stringify({
           material: "Steel",
           weight: "5kg",
@@ -25,7 +24,6 @@ module.exports = {
         name: "Health Potion",
         type: "Potion",
         description: "Restores health over time.",
-        quantity: 10,
         metadata: JSON.stringify({
           effect: "Heal 50 HP",
           duration: "30 seconds",
@@ -38,7 +36,6 @@ module.exports = {
         name: "Magic Wand",
         type: "Weapon",
         description: "Casts powerful spells.",
-        quantity: 10,
         metadata: JSON.stringify({
           spell: "Fireball",
           range: "Medium",
@@ -51,7 +48,6 @@ module.exports = {
         name: "Shield",
         type: "Armor",
         description: "Protects against attacks.",
-        quantity: 10,
         metadata: JSON.stringify({
           material: "Iron",
           weight: "8kg",
@@ -65,7 +61,6 @@ module.exports = {
         name: "Bow",
         type: "Weapon",
         description: "Long-range weapon.",
-        quantity: 10,
         metadata: JSON.stringify({
           material: "Wood",
           arrowType: "Steel-tipped",
@@ -78,7 +73,6 @@ module.exports = {
         name: "Arrow",
         type: "Ammunition",
         description: "Ammunition for bows.",
-        quantity: 10,
         metadata: JSON.stringify({
           material: "Wood",
           length: "30cm",
@@ -91,7 +85,6 @@ module.exports = {
         name: "Helmet",
         type: "Armor",
         description: "Protects the head.",
-        quantity: 10,
         metadata: JSON.stringify({
           material: "Steel",
           weight: "3kg",
@@ -105,7 +98,6 @@ module.exports = {
         name: "Boots",
         type: "Armor",
         description: "Increases movement speed.",
-        quantity: 10,
         metadata: JSON.stringify({
           material: "Leather",
           weight: "1.5kg",
@@ -118,7 +110,6 @@ module.exports = {
         name: "Ring of Strength",
         type: "Accessory",
         description: "Increases physical strength.",
-        quantity: 10,
         metadata: JSON.stringify({
           effect: "Strength +10",
           slot: "Ring",
@@ -130,7 +121,6 @@ module.exports = {
         name: "Amulet of Protection",
         type: "Accessory",
         description: "Reduces damage taken.",
-        quantity: 10,
         metadata: JSON.stringify({
           effect: "Damage Reduction 20",
           slot: "Amulet",
@@ -142,7 +132,6 @@ module.exports = {
         name: "Mana Potion",
         type: "Potion",
         description: "Restores mana.",
-        quantity: 10,
         metadata: JSON.stringify({
           effect: "Restore 50 MP",
           duration: "30 seconds",
@@ -155,7 +144,6 @@ module.exports = {
         name: "Fire Scroll",
         type: "Scroll",
         description: "Casts a fire spell.",
-        quantity: 10,
         metadata: JSON.stringify({
           spell: "Fireball",
           power: "High",
@@ -168,7 +156,6 @@ module.exports = {
         name: "Ice Scroll",
         type: "Scroll",
         description: "Casts an ice spell.",
-        quantity: 10,
         metadata: JSON.stringify({
           spell: "Ice Shard",
           power: "Medium",
@@ -181,7 +168,6 @@ module.exports = {
         name: "Teleport Scroll",
         type: "Scroll",
         description: "Teleports the user to a specified location.",
-        quantity: 10,
         metadata: JSON.stringify({
           destination: "Town Square",
           range: "Long",
@@ -193,7 +179,6 @@ module.exports = {
         name: "Invisibility Cloak",
         type: "Armor",
         description: "Makes the user invisible for a short duration.",
-        quantity: 10,
         metadata: JSON.stringify({
           duration: "60 seconds",
           rechargeTime: "5 minutes",

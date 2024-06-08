@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
-const constant = require("../../app/utils/constant.utils");
-const config = require("../../app/configs/general.config");
-const table = { schema: "game_server", tableName: "tbl_item" };
+const constant = require('../../app/utils/constant.utils');
+const config = require('../../app/configs/general.config');
+const table = {schema: "game_server", tableName: 'tbl_system_inventory'};
 
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -12,25 +12,17 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
       },
-      name: {
-        type: Sequelize.DataTypes.STRING(128),
+      player_id: {
+        type: Sequelize.DataTypes.BIGINT,
         allowNull: false,
       },
-      description: {
-        type: Sequelize.DataTypes.STRING,
+      item_id: {
+        type: Sequelize.DataTypes.BIGINT,
         allowNull: false,
       },
-      type: {
-        type: Sequelize.DataTypes.STRING(64),
+      price: {
+        type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
-      },
-      metadata: {
-        type: Sequelize.DataTypes.JSON,
-        allowNull: true,
-      },
-      deleted: {
-        type: Sequelize.DataTypes.BOOLEAN,
-        defaultValue: constant.BOOLEAN_ENUM.FALSE,
       },
       createdBy: {
         type: Sequelize.DataTypes.BIGINT,
