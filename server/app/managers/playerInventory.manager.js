@@ -2,13 +2,20 @@
 // third party components
 const Sequelize = require("sequelize");
 const async = require("async");
+const redis = require("redis");
 
 // our components
 const config = require("../configs/general.config");
-const { Item, Player } = require("../databases/postgreSQL/index");
+const { PlayerInventory, Item } = require("../databases/postgreSQL/index");
 const constant = require("../utils/constant.utils");
 const supporter = require("../utils/supporter.utils");
 const { pageableV2 } = require("../utils/pieces.utils");
+const { redisClient } = require("../utils/redis");
+
+// const redisClient = redis.createClient({
+//   socket: { host: `${process.env.REDIS_HOST}`, port: `${process.env.REDIS_PORT}` },
+// });
+
 
 module.exports = {
   create: function (accessUserId, accessUserType, data, callback) {
@@ -113,90 +120,96 @@ module.exports = {
     }
   },
 
-  getAll: function (accessUserId, accessUserType, filter, sort, search, pageNumber, pageSize, callback) {
+  getAll: async function (accessUserId, accessUserType, filter, sort, search, pageNumber, pageSize, callback) {
     try {
       if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
-        return callback(1, "permission_denied", 403, "permission denied", null);
+        return callback(1, "permission_denied", 403, "Permission denied", null);
       }
-
-      const query = {
-        attributes: ["id", "carId", "criteriaId", "isGood", "note", "updatedBy", "createdAt", "updatedAt", "deleted"],
-        where: {
-          deleted: constant.BOOLEAN_ENUM.FALSE,
-        },
-        include: [
-          {
-            model: User,
-            as: "Inspector",
-            attributes: ["id", "username", "email"],
+  
+      const key = `player_inventory:${accessUserId}:page:${pageNumber}:size:${pageSize}`;
+      let inventory = null;
+  
+      const cachedResult = await redisClient.get(key);
+      if (cachedResult) {
+        inventory = JSON.parse(cachedResult);
+      } else {
+        const query = {
+          where: {
+            player_id: accessUserId, 
           },
-        ],
-      };
-
-      // make query for filter, sorting, searching,  paginaion
-      supporter.pasteQuery(Result, query, filter, sort, search, pageNumber, pageSize);
-      Result.findAndCountAll(query)
-        .then(function (result) {
-          const foundCarList = result.rows;
-          const data = {
-            data: foundCarList,
-            pagination: pageableV2(pageNumber, pageSize, result.count),
-            items: {
-              begin: pageNumber * pageSize - pageSize + 1,
-              end: pageNumber * pageSize,
-              total: result.count,
+          include: [
+            {
+              model: Item,
+              as: "item",
+              attributes: ["id", "name", "description"],
             },
-          };
-          return callback(null, null, 200, null, data);
-        })
-        .catch(function (error) {
-          return callback(1, "query_fail", 400, error.message, null);
-        });
+          ],
+        };
+  
+        supporter.pasteQuery(PlayerInventory, query, filter, sort, search, pageNumber, pageSize);
+  
+        inventory = await PlayerInventory.findAndCountAll(query);
+  
+        await redisClient.set(key, JSON.stringify(inventory));
+      }
+  
+      const data = {
+        data: inventory.rows,
+        pagination: pageableV2(pageNumber, pageSize, inventory.count),
+        items: {
+          begin: pageNumber * pageSize - pageSize + 1,
+          end: Math.min(pageNumber * pageSize, inventory.count),
+          total: inventory.count,
+        },
+      };
+  
+      return callback(null, null, 200, null, data);
     } catch (error) {
       return callback(1, "get_result_fail", 400, error.message, null);
     }
   },
+  
 
   update: function (accessUserId, accessUserType, id, body, callback) {
     try {
       if (accessUserType < constant.USER_TYPE_ENUM.MANAGER) {
         return callback(1, "permission_denied", 403, "permission denied", null);
       }
+      //id -> playerId
 
       const data = {};
       data.updatedBy = accessUserId;
-      if (body.carId != "" && body.carId != null) {
-        data.carId = body.carId;
+      if (body.item_id != "" && body.item_id != null) {
+        data.item_id = body.item_id;
       }
-      if (body.criteriaId != "" && body.criteriaId != null) {
-        data.criteriaId = body.criteriaId;
+      if (body.quantity != "" && body.quantity != null) {
+        data.quantity = body.quantity;
       }
-      if (body.note != "" && body.note != null) {
-        data.note = body.note;
+      if (body.price != "" && body.price != null) {
+        data.price = body.price;
       }
 
       async.waterfall([
         // get result
         function (cb) {
-          Result.findOne({
+          PlayerInventory.findOne({
             where: {
-              id: id,
-              deleted: constant.BOOLEAN_ENUM.FALSE,
+              player_id: id,
             },
           }).then(function (result) {
             if (!result) {
-              return callback(1, "wrong_car", 420, "wrong car", null);
+              return callback(1, "wrong_update", 420, "wrong update", null);
             }
             return cb(null, result);
           });
         },
         // update car
-        function (car, cb) {
-          Result.build(data)
+        function (inventory, cb) {
+          PlayerInventory.build(data)
             .validate()
             .then(function () {
-              Object.assign(car, data);
-              car
+              Object.assign(inventory, data);
+              inventory
                 .save({
                   validate: false,
                 })
@@ -219,7 +232,7 @@ module.exports = {
         },
       ]);
     } catch (error) {
-      return callback(1, "update_car_fail", 400, error, null);
+      return callback(1, "update_fail", 400, error, null);
     }
   },
 

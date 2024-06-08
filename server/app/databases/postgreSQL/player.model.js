@@ -166,6 +166,10 @@ module.exports = (database, DataTypes) => {
         defaultValue: constant.USER_TYPE_ENUM.END_USER,
         comment: JSON.stringify(constant.USER_TYPE_ENUM),
       },
+      coin: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
       activated: {
         type: DataTypes.BOOLEAN,
         defaultValue: constant.BOOLEAN_ENUM.FALSE,

@@ -35,6 +35,10 @@ module.exports = {
         defaultValue: constant.USER_TYPE_ENUM.END_USER,
         comment: JSON.stringify(constant.USER_TYPE_ENUM),
       },
+      coin: {
+        type: Sequelize.DataTypes.INTEGER,
+        allowNull: true,
+      },
       activated: {
         type: Sequelize.DataTypes.BOOLEAN,
         defaultValue: constant.BOOLEAN_ENUM.FALSE,

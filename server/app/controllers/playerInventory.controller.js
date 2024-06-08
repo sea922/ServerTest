@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 // our components
 const config = require("../configs/general.config");
-const inventoryManager = require("../managers/inventory.manager");
+const playerInventoryManager = require("../managers/playerInventory.manager");
 const rest = require("../utils/restware.utils");
 const constant = require("../utils/constant.utils");
 
@@ -11,7 +11,7 @@ module.exports = {
     const accessUserId = req.body.accessUserId || global.INFO.anonymousId;
     const accessUserType =
       req.body.accessUserType || constant.USER_TYPE_ENUM.ANONYMOUS;
-      inventoryManager.create(
+      playerInventoryManager.create(
       accessUserId,
       accessUserType,
       data,
@@ -40,7 +40,7 @@ module.exports = {
     const accessUserType =
       req.query.accessUserType || constant.USER_TYPE_ENUM.ANONYMOUS;
     const id = req.params.id || "";
-    inventoryManager.getOne(
+    playerInventoryManager.getOne(
       accessUserId,
       accessUserType,
       id,
@@ -68,7 +68,7 @@ module.exports = {
     const search = req.query.search || "";
     const pageNumber = req.query.pageNumber || 1;
     const pageSize = req.query.pageSize || Number.MAX_SAFE_INTEGER;
-    inventoryManager.getAll(
+    playerInventoryManager.getAll(
       accessUserId,
       accessUserType,
       filter,
@@ -97,7 +97,7 @@ module.exports = {
       req.body.accessUserType || constant.USER_TYPE_ENUM.ANONYMOUS;
     const id = req.params.id || "";
     const data = req.body || "";
-    inventoryManager.update(
+    playerInventoryManager.update(
       accessUserId,
       accessUserType,
       id,
@@ -127,7 +127,7 @@ module.exports = {
     const accessUserType =
       req.body.accessUserType || constant.USER_TYPE_ENUM.ANONYMOUS;
     const id = req.params.id || "";
-    inventoryManager.delete(
+    playerInventoryManager.delete(
       accessUserId,
       accessUserType,
       id,
