@@ -1,0 +1,82 @@
+// third party components
+const Sequelize = require('sequelize');
+
+// our components
+const constant = require('../../utils/constant.utils');
+
+module.exports = (database, DataTypes) => {
+  class Item extends Sequelize.Model {
+    // initiate associate with other models (automatically called in ../models/index.js)
+    static associate(models) {
+      models.Item.hasMany(models.TransactionHistory, {
+        as: "listItem",
+        foreignKey: "item_id",
+      });
+    }
+  }
+
+  Item.init(
+      {
+        item_id: {
+          type: DataTypes.BIGINT,
+          autoIncrement: true,
+          allowNull: false,
+          primaryKey: true,
+        },
+        name: {
+          type: DataTypes.STRING(128),
+          allowNull: true,
+          validate: {
+            len: {
+              args: [2, 128],
+              msg: "name must between 2 and 128 characters",
+            },
+          },
+        },
+        description: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        type: {
+          type: DataTypes.STRING(64),
+          allowNull: true,
+        },
+        deleted: {
+          type: DataTypes.BOOLEAN,
+          defaultValue: constant.BOOLEAN_ENUM.FALSE,
+        },
+        createdBy: {
+          type: DataTypes.BIGINT,
+          allowNull: true,
+        },
+        updatedBy: {
+          type: DataTypes.BIGINT,
+          allowNull: true,
+        },
+        deletedBy: {
+          type: DataTypes.BIGINT,
+          allowNull: true,
+        },
+        createdAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+          defaultValue: Sequelize.NOW,
+        },
+        updatedAt: {
+          type: DataTypes.DATE,
+          allowNull: false,
+          defaultValue: Sequelize.NOW,
+        },
+        deletedAt: {
+          type: DataTypes.DATE,
+          allowNull: true,
+        },
+      },
+      {
+        sequelize: database,
+        tableName: 'tbl_item',
+      },
+  );
+
+  return Item;
+};

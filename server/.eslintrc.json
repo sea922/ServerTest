@@ -1,0 +1,30 @@
+{
+    "env": {
+        "commonjs": true,
+        "es6": true,
+        "node": true
+    },
+    "extends": ["google"],
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+        "ecmaVersion": 11
+    },
+    "rules": {
+        "max-len": [2, { "code": 1000, "tabWidth": 2, "ignoreUrls": true }],
+        "no-tabs": 0, //
+        "linebreak-style": "off",
+        "new-cap": "off",
+        "require-jsdoc": "off",
+        "no-undef": "error",
+	"no-unused-vars": "off",
+	"no-mixed-spaces-and-tabs": ["error", "smart-tabs"],
+    //
+    "space-before-function-paren": 0,
+    "indent": "off",
+    "arrow-parens": [true, "ban-single-arg-parens", "error", "as-needed"]
+
+    }
+}

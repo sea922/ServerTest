@@ -1,0 +1,12 @@
+storage/
+tmp/
+node_modules/
+public/docs
+.idea/
+.logs/
+.install/
+test/
+package-lock.json
+dist/
+log*/
+.vscode/

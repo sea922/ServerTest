@@ -1,0 +1,61 @@
+{
+  "apps": [
+    {
+      "name": "technical",
+      "script": "./server.js",
+      "instances": 1,
+      "exec_mode": "cluster",
+      "watch": false,
+      "ignore_watch": ["node_modules", "public", "logs", "migrations", "tmp", "storage"],
+			"error_file": "./logs/err_ci.log",
+      "out_file" : "./logs/out_ci.log",
+			"log_date_format": "YYYY-MM-DD HH:mm:ss.SSS Z",
+      "kill_timeout": 3000,
+      "wait_ready": true,
+      "listen_timeout": 3000,
+			"env_development": {
+        "NODE_ENV": "localhost",
+        "NODE_PORT": 7500,
+        "API_ROOT_URL": "http://localhost:7500",
+        "WEB_ROOT_URL": "",
+        "PG_DB_HOST": "localhost",
+        "PG_DB_PORT": "2345",
+        "PG_DB_DATABASE": "game_item_management",
+        "PG_DB_SCHEMA": "game_server",
+        "PG_DB_USERNAME": "postgres",
+        "PG_DB_PASSWORD": "password",
+        "PG_DB_DIALECT": "postgres"
+      },
+      "env_production": {
+        "NODE_ENV": "production",
+        "NODE_PORT": 7500,
+        "API_ROOT_URL": "http://localhost:7500",
+        "WEB_ROOT_URL": "",
+        "PG_DB_HOST": "localhost",
+        "PG_DB_PORT": "2345",
+        "PG_DB_DATABASE": "game_item_management",
+        "PG_DB_SCHEMA": "game_server",
+        "PG_DB_USERNAME": "postgres",
+        "PG_DB_PASSWORD": "password",
+        "PG_DB_DIALECT": "postgres",
+        "MONGO_URI": "mongodb+srv://poman:57smrvp89Rd6Nuu7@cluster0.1zk4jxc.mongodb.net/ItemManagement?retryWrites=true&w=majority&appName=Cluster0",
+        "REDIS_HOST": "localhost",
+        "REDIS_PORT": "6379",
+        "BROKER_HOST": "localhost:9092"
+      },
+      "env_localhost": {
+        "NODE_ENV": "localhost",
+        "NODE_PORT": 7500,
+        "API_ROOT_URL": "http://localhost:7500",
+        "WEB_ROOT_URL": "",
+        "DB_HOST": "localhost",
+        "DB_PORT": "2345",
+        "PG_DB_DATABASE": "game_item_management",
+        "PG_DB_SCHEMA": "game_server",
+        "PG_DB_USERNAME": "postgres",
+        "PG_DB_PASSWORD": "password",
+        "PG_DB_DIALECT": "postgres"
+      }
+    }
+  ]
+}
