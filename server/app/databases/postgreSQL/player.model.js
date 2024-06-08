@@ -84,7 +84,7 @@ module.exports = (database, DataTypes) => {
 
   Player.init(
       {
-        player_id: {
+        id: {
           type: DataTypes.BIGINT,
           autoIncrement: true,
           allowNull: false,

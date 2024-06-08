@@ -9,7 +9,7 @@ module.exports = (database, DataTypes) => {
     // initiate associate with other models (automatically called in ../models/index.js)
     static associate(models) {
       models.Item.hasMany(models.TransactionHistory, {
-        as: "listItem",
+        as: "transactions",
         foreignKey: "item_id",
       });
     }
@@ -17,7 +17,7 @@ module.exports = (database, DataTypes) => {
 
   Item.init(
       {
-        item_id: {
+        id: {
           type: DataTypes.BIGINT,
           autoIncrement: true,
           allowNull: false,
@@ -37,8 +37,16 @@ module.exports = (database, DataTypes) => {
           type: DataTypes.STRING,
           allowNull: true,
         },
+        metadata: {
+          type: DataTypes.JSON,
+          allowNull: true,
+        },
         type: {
           type: DataTypes.STRING(64),
+          allowNull: true,
+        },
+        quantity: {
+          type: DataTypes.BIGINT,
           allowNull: true,
         },
         deleted: {

@@ -22,7 +22,7 @@ module.exports = (database, DataTypes) => {
 
   TransactionHistory.init(
     {
-      transaction_id: {
+      id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
         autoIncrement: true,

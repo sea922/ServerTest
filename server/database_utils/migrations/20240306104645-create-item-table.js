@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
-const constant = require('../../app/utils/constant.utils');
-const config = require('../../app/configs/general.config');
-const table = {schema: "game_server", tableName: 'tbl_item'};
+const constant = require("../../app/utils/constant.utils");
+const config = require("../../app/configs/general.config");
+const table = { schema: "game_server", tableName: "tbl_item" };
 
 module.exports = {
   async up(queryInterface, Sequelize) {
     return queryInterface.createTable(table, {
-      item_id: {
+      id: {
         type: Sequelize.DataTypes.BIGINT,
         autoIncrement: true,
         allowNull: false,
@@ -15,7 +15,6 @@ module.exports = {
       name: {
         type: Sequelize.DataTypes.STRING(128),
         allowNull: false,
-        unique: true,
       },
       description: {
         type: Sequelize.DataTypes.STRING,
@@ -24,6 +23,18 @@ module.exports = {
       type: {
         type: Sequelize.DataTypes.STRING(64),
         allowNull: false,
+      },
+      metadata: {
+        type: Sequelize.DataTypes.JSON,
+        allowNull: true,
+      },
+      quantity: {
+        type: Sequelize.DataTypes.BIGINT,
+        allowNull: true,
+      },
+      deleted: {
+        type: Sequelize.DataTypes.BOOLEAN,
+        defaultValue: constant.BOOLEAN_ENUM.FALSE,
       },
       createdBy: {
         type: Sequelize.DataTypes.BIGINT,

@@ -6,7 +6,7 @@ const table = {schema: "game_server", tableName: 'tbl_transactions_history'};
 module.exports = {
   async up(queryInterface, Sequelize) {
     return queryInterface.createTable(table, {
-      transaction_id: {
+      id: {
         type: Sequelize.DataTypes.BIGINT,
         autoIncrement: true,
         allowNull: false,

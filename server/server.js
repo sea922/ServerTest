@@ -68,7 +68,7 @@ app.use(cors(corsOption));
 app.use(express.static(global.INFO.rootPath + config.paths.public));
 
 // Auth Middleware - This will check if the token is valid
-// app.all("/api/v1/auth/*", [require("./app/middlewares/auth.middelwares")]);
+app.all("/api/v1/auth/*", [require("./app/middlewares/auth.middelwares")]);
 
 // Create App
 const httpServer = require("http").createServer(app);
