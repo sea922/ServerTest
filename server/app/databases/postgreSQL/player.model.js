@@ -14,12 +14,12 @@ module.exports = (database, DataTypes) => {
     // initiate associate with other models (automatically called in ../models/index.js)
     static associate(models) {
       models.Player.hasMany(models.TransactionHistory, {
-        as: "list_transactions",
+        as: "transactions",
         foreignKey: "player_id",
       });
       models.Player.hasMany(models.PlayerInventory, {
-        as: "listItem",
-        foreignKey: "list_inventory_items",
+        as: "player_inventory_items",
+        foreignKey: "player_id",
       });
     }
 

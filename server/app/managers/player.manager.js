@@ -58,7 +58,6 @@ module.exports = {
       })
         .then(async (user) => {
           if (user) {
-    
             return callback(null, null, 200, null, user);
           }
           return callback(null, null, 200, null, null);
@@ -77,32 +76,17 @@ module.exports = {
         return callback(1, "permission_denied", 403, "permission denied", null);
       }
       if (!VerifyData.validNumberParam(id)) {
-				return callback(1, 'invalid_id', 400, 'user id is in-correct format', null);
-			}
+        return callback(1, "invalid_id", 400, "user id is in-correct format", null);
+      }
 
       Player.findOne({
-        attributes: [
-          "id",
-          "username",
-          "displayName",
-          "email",
-          "type",
-          "createdAt",
-          "updatedAt",
-          "deleted",
-        ],
+        attributes: ["id", "username", "displayName", "email", "type", "createdAt", "updatedAt", "deleted"],
         where: { id: id },
       })
         .then(function (user) {
           if (user) {
             if (user.deleted != constant.BOOLEAN_ENUM.FALSE) {
-              return callback(
-                1,
-                "deleted_user",
-                403,
-                "user has been deleted",
-                null
-              );
+              return callback(1, "deleted_user", 403, "user has been deleted", null);
             }
             return callback(null, null, 200, null, user);
           } else {
@@ -117,47 +101,21 @@ module.exports = {
     }
   },
 
-  getAll: function (
-    accessUserId,
-    accessUserType,
-    filter,
-    sort,
-    search,
-    pageNumber,
-    pageSize,
-    callback
-  ) {
+  getAll: function (accessUserId, accessUserType, filter, sort, search, pageNumber, pageSize, callback) {
     try {
       if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
         return callback(1, "permission_denied", 403, "permission denied", null);
       }
 
       const query = {
-        attributes: [
-          "id",
-          "username",
-          "displayName",
-          "password",
-          "email",
-          "type",
-          "createdAt",
-          "updatedAt",
-        ],
+        attributes: ["id", "username", "displayName", "password", "email", "type", "createdAt", "updatedAt"],
         where: {
           deleted: constant.BOOLEAN_ENUM.FALSE,
         },
       };
 
       // make query for filter, sorting, searching,  paginaion
-      supporter.pasteQuery(
-        User,
-        query,
-        filter,
-        sort,
-        search,
-        pageNumber,
-        pageSize
-      );
+      supporter.pasteQuery(User, query, filter, sort, search, pageNumber, pageSize);
       Player.findAndCountAll(query)
         .then(function (result) {
           const foundUserList = result.rows;
@@ -288,10 +246,7 @@ module.exports = {
   login: function (data, callback) {
     try {
       const where = {
-        [Sequelize.Op.or]: [
-          { username: data.username_or_email || "" },
-          { email: data.username_or_email || "" },
-        ],
+        [Sequelize.Op.or]: [{ username: data.username_or_email || "" }, { email: data.username_or_email || "" }],
       };
 
       Player.findOne({
@@ -300,17 +255,11 @@ module.exports = {
         .then((user) => {
           if (user) {
             if (user.deleted === constant.BOOLEAN_ENUM.TRUE) {
-              return callback(
-                1,
-                "deleted_user",
-                400,
-                "User has been deleted",
-                null
-              );
+              return callback(1, "deleted_user", 400, "User has been deleted", null);
             } else if (!user.checkPassword(data.password)) {
               return callback(1, "wrong_password", 400, "Wrong password", null);
             }
-            // else if (user.type < constant.USER_TYPE_ENUM.MECHANICAL) {
+            // else if (user.type < constant.USER_TYPE_ENUM.MANAGER) {
             //   return callback(
             //     1,
             //     "permission_denied",
@@ -351,13 +300,7 @@ module.exports = {
         .then((user) => {
           if (user) {
             if (user.deleted === constant.BOOLEAN_ENUM.TRUE) {
-              return callback(
-                1,
-                "deleted_user",
-                400,
-                "User has been deleted",
-                null
-              );
+              return callback(1, "deleted_user", 400, "User has been deleted", null);
             } else {
               return callback(null, null, 200, null, user);
             }

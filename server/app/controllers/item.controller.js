@@ -27,9 +27,8 @@ module.exports = {
         }
         const resData = {};
         resData.id = result.id;
-        resData.carId = result.carId;
-        resData.criteriaId = result.criteriaId;
-        resData.note = result.note;
+        resData.name = result.name;
+        resData.metadata = result.metadata;
         return rest.sendSuccessOne(res, resData, httpCode);
       }
     );

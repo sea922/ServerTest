@@ -6,7 +6,7 @@ const async = require("async");
 // our components
 const config = require("../configs/general.config");
 const { Item } = require("../databases/postgreSQL/index");
-const { ItemDetail } = require('../databases/postgreSQL/index');
+const { ItemDetail } = require("../databases/postgreSQL/index");
 const constant = require("../utils/constant.utils");
 const supporter = require("../utils/supporter.utils");
 const { pageableV2 } = require("../utils/pieces.utils");
@@ -14,8 +14,7 @@ const { pageableV2 } = require("../utils/pieces.utils");
 module.exports = {
   create: function (accessUserId, accessUserType, data, callback) {
     try {
-
-      if (accessUserType < constant.USER_TYPE_ENUM.MECHANICAL) {
+      if (accessUserType < constant.USER_TYPE_ENUM.MANAGER) {
         return callback(1, "permission_denied", 403, "permission denied", null);
       }
       Item.build({
@@ -55,7 +54,6 @@ module.exports = {
     }
   },
 
-
   getOne: function (accessUserId, accessUserType, id, callback) {
     try {
       if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
@@ -63,30 +61,13 @@ module.exports = {
       }
 
       Item.findOne({
-        attributes: [
-          "id",
-          "name",
-          "description",
-          "type",
-          "metadata",
-          "quantity",
-          "updatedBy",
-          "createdAt",
-          "updatedAt",
-          "deleted",
-        ],
+        attributes: ["id", "name", "description", "type", "metadata", "updatedBy", "createdAt", "updatedAt", "deleted"],
         where: { item_id: id },
       })
         .then(function (result) {
           if (result) {
             if (result.deleted != constant.BOOLEAN_ENUM.FALSE) {
-              return callback(
-                1,
-                "deleted_result",
-                403,
-                "result has been deleted",
-                null
-              );
+              return callback(1, "deleted_result", 403, "result has been deleted", null);
             }
             return callback(null, null, 200, null, result);
           } else {
@@ -101,16 +82,7 @@ module.exports = {
     }
   },
 
-  getAll : function (
-    accessUserId,
-    accessUserType,
-    filter,
-    sort,
-    search,
-    pageNumber,
-    pageSize,
-    callback
-  ) {
+  getAll: function (accessUserId, accessUserType, filter, sort, search, pageNumber, pageSize, callback) {
     try {
       // Check user permissions
 
@@ -118,35 +90,16 @@ module.exports = {
       if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
         return callback(1, "permission_denied", 403, "permission denied", null);
       }
-  
+
       const query = {
-        attributes: [
-          "id",
-          "name",
-          "description",
-          "type",
-          "metadata",
-          "quantity",
-          "updatedBy",
-          "createdAt",
-          "updatedAt",
-          "deleted",
-        ],
+        attributes: ["id", "name", "description", "type", "metadata", "updatedBy", "createdAt", "updatedAt", "deleted"],
         where: {
           deleted: constant.BOOLEAN_ENUM.FALSE,
         },
       };
-  
-      supporter.pasteQuery(
-        Item,
-        query,
-        filter,
-        sort,
-        search,
-        pageNumber,
-        pageSize
-      );
-  
+
+      supporter.pasteQuery(Item, query, filter, sort, search, pageNumber, pageSize);
+
       Item.findAndCountAll(query)
         .then(function (result) {
           const foundItemList = result.rows;
@@ -172,7 +125,7 @@ module.exports = {
 
   update: function (accessUserId, accessUserType, id, body, callback) {
     try {
-      if (accessUserType < constant.USER_TYPE_ENUM.MECHANICAL) {
+      if (accessUserType < constant.USER_TYPE_ENUM.MANAGER) {
         return callback(1, "permission_denied", 403, "permission denied", null);
       }
 
@@ -236,7 +189,7 @@ module.exports = {
 
   delete: function (accessUserId, accessUserType, id, callback) {
     try {
-      if (accessUserType < constant.USER_TYPE_ENUM.MECHANICAL) {
+      if (accessUserType < constant.USER_TYPE_ENUM.MANAGER) {
         return callback(1, "permission_denied", 403, "permission denied", null);
       }
 
