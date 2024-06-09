@@ -9,10 +9,10 @@ module.exports = function (app) {
 	app.post('/api/v1/auth/player-inventories', playerInventoryController.create);
 
 	
-	app.get('/api/v1/auth/player-inventories/:id', playerInventoryController.getOne);
+	app.get('/api/v1/auth/player-inventories/:id', playerInventoryController.getOneItemOfPlayer);
 
 	
-	app.get('/api/v1/auth/player-inventories', playerInventoryController.getAll);
+	app.get('/api/v1/auth/player-inventories', playerInventoryController.getAllPlayerItems);
 
 	
 	app.patch('/api/v1/auth/player-inventories/:id', playerInventoryController.update);

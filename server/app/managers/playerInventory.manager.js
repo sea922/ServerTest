@@ -10,7 +10,7 @@ const { PlayerInventory, Item } = require("../databases/postgreSQL/index");
 const constant = require("../utils/constant.utils");
 const supporter = require("../utils/supporter.utils");
 const { pageableV2 } = require("../utils/pieces.utils");
-const { redisClient } = require("../utils/redis");
+const { redisClient, parseRedisResult, prepareRedisData } = require("../utils/redis");
 
 // const redisClient = redis.createClient({
 //   socket: { host: `${process.env.REDIS_HOST}`, port: `${process.env.REDIS_PORT}` },
@@ -18,98 +18,31 @@ const { redisClient } = require("../utils/redis");
 
 
 module.exports = {
-  create: function (accessUserId, accessUserType, data, callback) {
-    try {
-      if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
-        return callback(1, "permission_denied", 403, "Permission denied", null);
-      }
 
-      Result.findOne({
-        where: {
-          carId: data.carId,
-          criteriaId: data.criteriaId,
-        },
-      })
-        .then(function (existingResult) {
-          if (existingResult) {
-            existingResult
-              .update({
-                isGood: data.isGood,
-                note: data.note,
-                createdBy: accessUserId,
-              })
-              .then(function (updatedResult) {
-                return callback(null, null, 200, null, updatedResult);
-              })
-              .catch(function (error) {
-                return callback(true, "update_fail", 400, error, null);
-              });
-          } else {
-            Result.build({
-              carId: data.carId,
-              criteriaId: data.criteriaId,
-              isGood: data.isGood,
-              note: data.note,
-              createdBy: accessUserId,
-              updatedBy: accessUserId,
-            })
-              .validate()
-              .then(function (result) {
-                result
-                  .save({
-                    validate: false,
-                  })
-                  .then(function (res) {
-                    return callback(null, null, 200, null, res);
-                  })
-                  .catch(function (error) {
-                    return callback(true, "query_fail", 400, error, null);
-                  });
-              })
-              .catch(function (validate) {
-                const errors = validate.errors.map(function (e) {
-                  return {
-                    name: e.path,
-                    message: e.message,
-                  };
-                });
-                return callback(1, "invalid_input", 403, errors, null);
-              });
-          }
-        })
-        .catch(function (error) {
-          return callback(true, "query_fail", 400, error, null);
-        });
-    } catch (error) {
-      return callback(1, "create_car_fail", 400, error, null);
-    }
-  },
-
-  getOne: function (accessUserId, accessUserType, id, callback) {
+  getOneItemOfPlayer: function (accessUserId, accessUserType, id, callback) {
     try {
       if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
         return callback(1, "permission_denied", 403, "permission denied", null);
       }
 
-      Result.findOne({
-        attributes: ["id", "carId", "criteriaId", "isGood", "note", "updatedBy", "createdAt", "updatedAt", "deleted"],
-        where: { id: id },
+      PlayerInventory.findOne({
+        where: { item_id: id, player_id: accessUserId },
         include: [
           {
-            model: User,
-            as: "Inspector",
-            attributes: ["id", "username", "email"],
+            model: Item,
+            as: "item",
+            attributes: ["id", "name", "description", "type","metadata"],
           },
         ],
       })
         .then(function (result) {
           if (result) {
-            if (result.deleted != constant.BOOLEAN_ENUM.FALSE) {
-              return callback(1, "deleted_result", 403, "result has been deleted", null);
+            if (result.deletedAt != null) {
+              return callback(1, "deleted_result", 403, "item not exist", null);
             }
             return callback(null, null, 200, null, result);
           } else {
-            return callback(1, "wrong_result", 400, "wrong result", null);
+            return callback(1, "wrong_item", 400, "wrong item", null);
           }
         })
         .catch(function (error) {
@@ -120,7 +53,7 @@ module.exports = {
     }
   },
 
-  getAll: async function (accessUserId, accessUserType, filter, sort, search, pageNumber, pageSize, callback) {
+  getAllPlayerItems: async function (accessUserId, accessUserType, filter, sort, search, pageNumber, pageSize, callback) {
     try {
       if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
         return callback(1, "permission_denied", 403, "Permission denied", null);
@@ -128,10 +61,11 @@ module.exports = {
   
       const key = `player_inventory:${accessUserId}:page:${pageNumber}:size:${pageSize}`;
       let inventory = null;
-  
-      const cachedResult = await redisClient.get(key);
-      if (cachedResult) {
-        inventory = JSON.parse(cachedResult);
+
+      // const cachedResult = await redisClient.get(key);
+      const cachedResult = await redisClient.zRange(key, (pageNumber - 1) * pageSize, pageNumber * pageSize - 1, "WITHSCORES");
+      if (cachedResult && cachedResult.length > 0) {
+        inventory = parseRedisResult(cachedResult);
       } else {
         const query = {
           where: {
@@ -141,16 +75,19 @@ module.exports = {
             {
               model: Item,
               as: "item",
-              attributes: ["id", "name", "description", "type","metdata"],
+              attributes: ["id", "name", "description", "type","metadata"],
             },
           ],
         };
-  
+
         supporter.pasteQuery(PlayerInventory, query, filter, sort, search, pageNumber, pageSize);
   
         inventory = await PlayerInventory.findAndCountAll(query);
-  
-        await redisClient.set(key, JSON.stringify(inventory));
+
+        // await redisClient.set(key, JSON.stringify(inventory));
+         // Convert the result to the format expected by zadd command
+        const redisData = prepareRedisData(inventory.rows);
+        await redisClient.zAdd(key, redisData);
       }
   
       const data = {

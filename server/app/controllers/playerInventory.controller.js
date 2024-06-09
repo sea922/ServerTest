@@ -35,12 +35,12 @@ module.exports = {
     );
   },
 
-  getOne: function (req, res) {
+  getOneItemOfPlayer: function (req, res) {
     const accessUserId = req.query.accessUserId || global.INFO.anonymousId;
     const accessUserType =
       req.query.accessUserType || constant.USER_TYPE_ENUM.ANONYMOUS;
     const id = req.params.id || "";
-    playerInventoryManager.getOne(
+    playerInventoryManager.getOneItemOfPlayer(
       accessUserId,
       accessUserType,
       id,
@@ -59,7 +59,7 @@ module.exports = {
     );
   },
 
-  getAll: function (req, res) {
+  getAllPlayerItems: function (req, res) {
     const accessUserId = req.query.accessUserId || global.INFO.anonymousId;
     const accessUserType =
       req.query.accessUserType || constant.USER_TYPE_ENUM.ANONYMOUS;
@@ -68,7 +68,7 @@ module.exports = {
     const search = req.query.search || "";
     const pageNumber = req.query.pageNumber || 1;
     const pageSize = req.query.pageSize || Number.MAX_SAFE_INTEGER;
-    playerInventoryManager.getAll(
+    playerInventoryManager.getAllPlayerItems(
       accessUserId,
       accessUserType,
       filter,

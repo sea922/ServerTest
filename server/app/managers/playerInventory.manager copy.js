@@ -10,12 +10,12 @@ const { PlayerInventory, Item } = require("../databases/postgreSQL/index");
 const constant = require("../utils/constant.utils");
 const supporter = require("../utils/supporter.utils");
 const { pageableV2 } = require("../utils/pieces.utils");
-// const { redisClient } = require("../utils/redis");
-const Logger = require("../utils/logger.utils");
+const { redisClient, parseRedisResult, prepareRedisData } = require("../utils/redis");
 
-const redisClient = redis.createClient({
-  socket: { host: `${process.env.REDIS_HOST}`, port: `${process.env.REDIS_PORT}` },
-});
+// const redisClient = redis.createClient({
+//   socket: { host: `${process.env.REDIS_HOST}`, port: `${process.env.REDIS_PORT}` },
+// });
+
 
 module.exports = {
   create: function (accessUserId, accessUserType, data, callback) {
@@ -91,25 +91,24 @@ module.exports = {
         return callback(1, "permission_denied", 403, "permission denied", null);
       }
 
-      Result.findOne({
-        attributes: ["id", "carId", "criteriaId", "isGood", "note", "updatedBy", "createdAt", "updatedAt", "deleted"],
+      PlayerInventory.findOne({
         where: { id: id },
         include: [
           {
-            model: User,
-            as: "Inspector",
-            attributes: ["id", "username", "email"],
+            model: Item,
+            as: "item",
+            attributes: ["id", "name", "description", "type","metadata"],
           },
         ],
       })
         .then(function (result) {
           if (result) {
             if (result.deleted != constant.BOOLEAN_ENUM.FALSE) {
-              return callback(1, "deleted_result", 403, "result has been deleted", null);
+              return callback(1, "deleted_result", 403, "inventory has been deleted", null);
             }
             return callback(null, null, 200, null, result);
           } else {
-            return callback(1, "wrong_result", 400, "wrong result", null);
+            return callback(1, "wrong_inventory", 400, "wrong inventory", null);
           }
         })
         .catch(function (error) {
@@ -123,91 +122,97 @@ module.exports = {
   getAll: async function (accessUserId, accessUserType, filter, sort, search, pageNumber, pageSize, callback) {
     try {
       if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
-        return callback(1, "permission_denied", 403, "permission denied", null);
+        return callback(1, "permission_denied", 403, "Permission denied", null);
       }
-      await redisClient.connect().then(async () => {
-        const a = await redisClient.get("player_inventory:2");
-        if(a) return callback(1, "get_result_fail", 400, error.message, null);
-        redisClient.on("error", (err) => {
-        });
-      });
+  
+      const key = `player_inventory:${accessUserId}:page:${pageNumber}:size:${pageSize}`;
+      let inventory = null;
 
-
-      const query = {
-        include: [
-          {
-            model: Item,
-            as: "item",
-            attributes: ["id", "name", "description"],
+      // const cachedResult = await redisClient.get(key);
+      const cachedResult = await redisClient.zRange(key, (pageNumber - 1) * pageSize, pageNumber * pageSize - 1, "WITHSCORES");
+      if (cachedResult && cachedResult.length > 0) {
+        inventory = parseRedisResult(cachedResult);
+      } else {
+        const query = {
+          where: {
+            player_id: accessUserId, 
           },
-        ],
-      };
+          include: [
+            {
+              model: Item,
+              as: "item",
+              attributes: ["id", "name", "description", "type","metadata"],
+            },
+          ],
+        };
 
-      // make query for filter, sorting, searching,  paginaion
-      // supporter.pasteQuery(PlayerInventory, query, filter, sort, search, pageNumber, pageSize);
-      // PlayerInventory.findAndCountAll(query)
-      //   .then(function (result) {
-      //     const foundCarList = result.rows;
-      //     const data = {
-      //       data: foundCarList,
-      //       pagination: pageableV2(pageNumber, pageSize, result.count),
-      //       items: {
-      //         begin: pageNumber * pageSize - pageSize + 1,
-      //         end: pageNumber * pageSize,
-      //         total: result.count,
-      //       },
-      //     };
-      //     return callback(null, null, 200, null, data);
-      //   })
-      //   .catch(function (error) {
-      //     return callback(1, "query_fail", 400, error.message, null);
-      //   });
+        supporter.pasteQuery(PlayerInventory, query, filter, sort, search, pageNumber, pageSize);
+  
+        inventory = await PlayerInventory.findAndCountAll(query);
+
+        // await redisClient.set(key, JSON.stringify(inventory));
+         // Convert the result to the format expected by zadd command
+        const redisData = prepareRedisData(inventory.rows);
+        await redisClient.zAdd(key, redisData);
+      }
+  
+      const data = {
+        data: inventory.rows,
+        pagination: pageableV2(pageNumber, pageSize, inventory.count),
+        items: {
+          begin: pageNumber * pageSize - pageSize + 1,
+          end: Math.min(pageNumber * pageSize, inventory.count),
+          total: inventory.count,
+        },
+      };
+  
+      return callback(null, null, 200, null, data);
     } catch (error) {
-      console.log(error);
       return callback(1, "get_result_fail", 400, error.message, null);
     }
   },
+  
 
   update: function (accessUserId, accessUserType, id, body, callback) {
     try {
-      if (accessUserType < constant.USER_TYPE_ENUM.MANAGER) {
+      if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
         return callback(1, "permission_denied", 403, "permission denied", null);
       }
+      //id -> playerId
 
       const data = {};
       data.updatedBy = accessUserId;
-      if (body.carId != "" && body.carId != null) {
-        data.carId = body.carId;
+      data.player_id = id;
+      if (body.item_id != "" && body.item_id != null) {
+        data.item_id = body.item_id;
       }
-      if (body.criteriaId != "" && body.criteriaId != null) {
-        data.criteriaId = body.criteriaId;
-      }
-      if (body.note != "" && body.note != null) {
-        data.note = body.note;
+      if (body.quantity != "" && body.quantity != null) {
+        data.quantity = body.quantity;
       }
 
       async.waterfall([
         // get result
         function (cb) {
-          Result.findOne({
+          PlayerInventory.findOne({
             where: {
-              id: id,
-              deleted: constant.BOOLEAN_ENUM.FALSE,
+              player_id: data.player_id,
+              item_id: data.item_id
             },
           }).then(function (result) {
+            data.price = result.price;
             if (!result) {
-              return callback(1, "wrong_car", 420, "wrong car", null);
+              return callback(1, "wrong_update", 420, "wrong update", null);
             }
             return cb(null, result);
           });
         },
         // update car
-        function (car, cb) {
-          Result.build(data)
+        function (inventory, cb) {
+          PlayerInventory.build(data)
             .validate()
             .then(function () {
-              Object.assign(car, data);
-              car
+              Object.assign(inventory, data);
+              inventory
                 .save({
                   validate: false,
                 })
@@ -230,7 +235,7 @@ module.exports = {
         },
       ]);
     } catch (error) {
-      return callback(1, "update_car_fail", 400, error, null);
+      return callback(1, "update_fail", 400, error, null);
     }
   },
 
