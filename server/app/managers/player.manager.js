@@ -80,7 +80,7 @@ module.exports = {
       }
 
       Player.findOne({
-        attributes: ["id", "username", "displayName", "email", "type", "createdAt", "updatedAt", "deleted"],
+        attributes: ["id", "username", "displayName", "email", "type", "coin", "capacity", "createdAt", "updatedAt", "deleted"],
         where: { id: id },
       })
         .then(function (user) {

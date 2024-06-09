@@ -120,6 +120,35 @@ module.exports = {
     );
   },
 
+  buyItems: function (req, res) {
+    const accessUserId = req.body.accessUserId || global.INFO.anonymousId;
+    const accessUserType =
+      req.body.accessUserType || constant.USER_TYPE_ENUM.ANONYMOUS;
+    const data = req.body || "";
+    playerInventoryManager.buyItems(
+      accessUserId,
+      accessUserType,
+      data,
+      function (errorCode, errorMessage, httpCode, errorDescription, result) {
+        if (errorCode) {
+          return rest.sendError(
+            res,
+            errorCode,
+            errorMessage,
+            httpCode,
+            errorDescription
+          );
+        }
+        const resData = {};
+        resData.playerInventoryId = result.id;
+        resData.item_id = result.item_id;
+        resData.player_id = result.player_id;
+        resData.quantity = result.quantity;
+        return rest.sendSuccessOne(res, resData, httpCode);
+      }
+    );
+  },
+
   delete: function (req, res) {
     const accessUserId = req.body.accessUserId || global.INFO.anonymousId;
     const accessUserType =

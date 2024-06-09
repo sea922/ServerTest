@@ -16,7 +16,8 @@ module.exports = function (app) {
 
 	
 	app.post('/api/v1/auth/player-inventories/sell', playerInventoryController.sellItems);
-	// app.patch('/api/v1/auth/sell-item/:id', playerInventoryController.sellItems);
+
+	app.post('/api/v1/auth/player-inventories/buy', playerInventoryController.buyItems);
 
 	
 	app.delete('/api/v1/auth/player-inventories/:id', playerInventoryController.delete);

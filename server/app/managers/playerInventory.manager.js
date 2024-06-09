@@ -198,23 +198,22 @@ module.exports = {
             playerInventory.save();
             player.save();
 
-
             const transactionData = {
               playerId: data.playerId,
               itemId: data.itemId,
               type: constant.TRANSACTION_TYPE.SELL,
               quantityChange: data.quantity,
-              previousQuantity: playerInventory.quantity,
-              currentQuantity: playerInventory.quantity - data.quantity,
+              previousQuantity: playerInventory.quantity + parseInt(data.quantity),
+              currentQuantity: playerInventory.quantity,
               timestamp: Date.now(),
               // dataChange: ItemData
             };
 
             const updatedItemData = {
               quantity: playerInventory.quantity,
-          };
+            };
 
-            await updateItem(data.itemId, updatedItemData)
+            await updateItem(data.itemId, updatedItemData);
 
             // await redisClient.set(transactionKey, JSON.stringify(transactionData));
 
@@ -223,12 +222,132 @@ module.exports = {
 
             return callback(null, null, 200, null, playerInventory);
           } catch (error) {
-            return callback(1, "update_fail", 400, error, null);
+            return callback(1, "sell_item_fail", 400, error, null);
           }
         },
       ]);
     } catch (error) {
-      return callback(1, "update_fail", 400, error, null);
+      return callback(1, "sell_item_fail", 400, error, null);
+    }
+  },
+
+  buyItems: async function (accessUserId, accessUserType, body, callback) {
+    try {
+      if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
+        return callback(1, "permission_denied", 403, "permission denied", null);
+      }
+
+      const data = {};
+      data.updatedBy = accessUserId;
+      data.playerId = accessUserId;
+
+      if (body.itemId != "" && body.itemId != null) {
+        data.itemId = body.itemId;
+      }
+      if (body.quantity != "" && body.quantity != null) {
+        data.quantity = parseInt(body.quantity);
+      }
+
+      if (!data.itemId || !body.quantity) {
+        return callback(1, "missing", 403, "Please provide itemId, and quantity", null);
+      }
+
+      async.waterfall([
+        // get result
+        function (cb) {
+          Item.findOne({
+            where: {
+              id: data.itemId,
+            },
+          }).then(function (result) {
+            if (!result) {
+              return callback(1, "wrong_buy", 420, "item does not exist", null);
+            }
+            return cb(null, result);
+          });
+        },
+        // update
+        async function (result, cb) {
+          try {
+            data.buyPrice = result.buyPrice;
+
+            const totalPrice = data.buyPrice * data.quantity;
+
+            // Update player balance
+            const player = await Player.findOne({
+              where: {
+                id: data.playerId,
+                capacity: { [Sequelize.Op.gt]: data.quantity },
+                coin: { [Sequelize.Op.gte]: totalPrice },
+              },
+              attributes: ["id", "username", "coin", "capacity"],
+            });
+            if (!player) {
+              return callback(1, "item_purchase_failed", 404, "Item purchase failed", null);
+            }
+
+            const playerInventory = await PlayerInventory.findOne({
+              where: { playerId: data.playerId, itemId: data.itemId },
+            });
+
+            if(!playerInventory) {
+              PlayerInventory.build({
+                playerId: data.playerId,
+                itemId: data.itemId,
+                quantity: data.quantity,
+                createdBy: global.INFO.anonymousId,
+                updatedBy: global.INFO.anonymousId,
+              })
+                .validate()
+                .then(function (item) {
+                  item
+                    .save({
+                      validate: false,
+                    })
+                    .then(function (result) {
+                      return callback(null, null, 200, null, result);
+                    })
+                    .catch(function (error) {
+                      console.log(error);
+                      return callback(true, "query_fail", 400, error, null);
+                    });
+                })
+            }
+
+            // Record transaction history
+            player.coin -= totalPrice;
+            player.capacity -= parseInt(data.quantity);
+            playerInventory.quantity += parseInt(data.quantity);
+            playerInventory.save();
+            player.save();
+
+            const transactionData = {
+              playerId: data.playerId,
+              itemId: data.itemId,
+              type: constant.TRANSACTION_TYPE.BUY,
+              quantityChange: data.quantity,
+              previousQuantity: playerInventory.quantity - parseInt(data.quantity),
+              currentQuantity: playerInventory.quantity,
+              timestamp: Date.now(),
+              // dataChange: ItemData
+            };
+
+            const updatedItemData = {
+              quantity: playerInventory.quantity,
+            };
+
+            await updateItem(data.itemId, updatedItemData);
+            // Produce Kafka message
+            await produceMessage("inventory_updates", transactionData);
+
+            return callback(null, null, 200, null, playerInventory);
+          } catch (error) {
+            return callback(1, "buy_item_fail", 400, error, null);
+          }
+        },
+      ]);
+    } catch (error) {
+      return callback(1, "buy_item_fail", 400, error, null);
     }
   },
 
