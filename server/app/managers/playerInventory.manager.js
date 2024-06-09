@@ -169,8 +169,8 @@ module.exports = {
             const playerInventory = await PlayerInventory.findOne({
               where: { playerId: data.playerId, itemId: data.itemId },
             });
-            if (!playerInventory) {
-              return callback(1, "player_inventory_not_found", 404, "Player inventory not found", null);
+            if (!playerInventory || data.quantity > playerInventory.quantity) {
+              return callback(1, "player_inventory_not_found", 404, "Item not found or insufficient", null);
             }
 
             const totalPrice = data.sellPrice * data.quantity;
