@@ -38,6 +38,12 @@ module.exports = {
       coin: {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: true,
+        defaultValue: 1000,
+      },
+      capacity: {
+        type: Sequelize.DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 100,
       },
       activated: {
         type: Sequelize.DataTypes.BOOLEAN,

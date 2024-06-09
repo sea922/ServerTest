@@ -36,6 +36,11 @@ const ACTION_ENUM = {
   DELETE: "D",
 };
 
+const TRANSACTION_TYPE = {
+  SELL: "sell",
+  BUY: "buy",
+};
+
 const PERMISSION_ENUM = {
   VIEW: 1,
   UPDATE: 2,
@@ -254,4 +259,5 @@ module.exports = {
   TAPE_DEFAUL_CAPACITY,
   DEFAULT_TAPE_GROUP,
   DEFAULT_LIBRARY_GROUP,
+  TRANSACTION_TYPE
 };

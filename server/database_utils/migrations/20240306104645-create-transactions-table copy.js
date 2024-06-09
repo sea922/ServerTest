@@ -20,6 +20,10 @@ module.exports = {
         type: Sequelize.DataTypes.BIGINT,
         allowNull: false,
       },
+      type: {
+        type: Sequelize.DataTypes.STRING(10),
+        allowNull: false,
+      },
       quantityChange: {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,

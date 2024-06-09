@@ -48,7 +48,7 @@ const processTransactions = async () => {
               // Process the transaction data and record inventory balance update history
               const transactionKey = `transaction:${transactionData.timestamp}:${transactionData.updatedBy}`;
               const transactionBody = {
-                  // action: transactionData.action,
+                  type: transactionData.type,
                   playerId: transactionData.playerId,
                   itemId: transactionData.itemId,
                   quantityChange: transactionData.quantityChange,

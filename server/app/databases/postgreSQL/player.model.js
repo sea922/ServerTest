@@ -169,6 +169,12 @@ module.exports = (database, DataTypes) => {
       coin: {
         type: DataTypes.INTEGER,
         allowNull: true,
+        defaultValue: 1000,
+      },
+      capacity: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 100,
       },
       activated: {
         type: DataTypes.BOOLEAN,

@@ -48,6 +48,10 @@ module.exports = (database, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      type: {
+        type: DataTypes.STRING(10),
+        allowNull: false,
+      },
       createdAt: {
         type: DataTypes.DATE, // or Sequelize.DataTypes.DATE,
         allowNull: true,

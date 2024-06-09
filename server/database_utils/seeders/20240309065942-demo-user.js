@@ -14,6 +14,7 @@ module.exports = {
         password: bCrypt.hashSync("admin", 10),
         type: constant.USER_TYPE_ENUM.SUPER_ADMIN,
         coin: 10000,
+        capacity: 100,
         activated: constant.BOOLEAN_ENUM.TRUE,
       },
       {
@@ -23,6 +24,7 @@ module.exports = {
         password: bCrypt.hashSync("player1", 10),
         type: constant.USER_TYPE_ENUM.END_USER,
         coin: 10000,
+        capacity: 100,
         activated: constant.BOOLEAN_ENUM.TRUE,
       },
       {
@@ -32,6 +34,7 @@ module.exports = {
         password: bCrypt.hashSync("player2", 10),
         type: constant.USER_TYPE_ENUM.END_USER,
         coin: 10000,
+        capacity: 100,
         activated: constant.BOOLEAN_ENUM.TRUE,
       },
       {
@@ -41,6 +44,7 @@ module.exports = {
         password: bCrypt.hashSync("player3", 10),
         type: constant.USER_TYPE_ENUM.END_USER,
         coin: 10000,
+        capacity: 100,
         activated: constant.BOOLEAN_ENUM.TRUE,
       },
       {
@@ -50,6 +54,7 @@ module.exports = {
         password: bCrypt.hashSync("player4", 10),
         type: constant.USER_TYPE_ENUM.END_USER,
         coin: 10000,
+        capacity: 100,
         activated: constant.BOOLEAN_ENUM.TRUE,
       },
       {
@@ -59,6 +64,7 @@ module.exports = {
         password: bCrypt.hashSync("player5", 10),
         type: constant.USER_TYPE_ENUM.END_USER,
         coin: 10000,
+        capacity: 100,
         activated: constant.BOOLEAN_ENUM.TRUE,
       },
     ]);

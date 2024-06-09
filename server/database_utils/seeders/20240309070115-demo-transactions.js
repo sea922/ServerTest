@@ -12,6 +12,7 @@ module.exports = {
         quantityChange: 5,
         previousQuantity: 0,
         currentQuantity: 5,
+        type: "buy",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -21,6 +22,7 @@ module.exports = {
         quantityChange: 3,
         previousQuantity: 0,
         currentQuantity: 3,
+        type: "buy",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -30,6 +32,7 @@ module.exports = {
         quantityChange: 2,
         previousQuantity: 0,
         currentQuantity: 2,
+        type: "sell",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -42,4 +45,3 @@ module.exports = {
     return queryInterface.bulkDelete(table, null, {});
   },
 };
-

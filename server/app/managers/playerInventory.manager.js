@@ -169,7 +169,7 @@ module.exports = {
             const playerInventory = await PlayerInventory.findOne({
               where: { playerId: data.playerId, itemId: data.itemId },
             });
-            if (!playerInventory || data.quantity > playerInventory.quantity) {
+            if (!playerInventory || data.quantity > playerInventory.quantity || playerInventory.quantity - parseInt(data.quantity) < 0) {
               return callback(1, "player_inventory_not_found", 404, "Item not found or insufficient", null);
             }
 
@@ -180,7 +180,7 @@ module.exports = {
               where: {
                 id: data.playerId,
               },
-              attributes: ["id", "username", "coin"],
+              attributes: ["id", "username", "coin", "capacity"],
             });
             if (!player) {
               return callback(1, "player_not_found", 404, "Player not found", null);
@@ -192,16 +192,18 @@ module.exports = {
             const transactionData = {
               playerId: data.playerId,
               itemId: data.itemId,
-              action: "sell",
+              type: constant.TRANSACTION_TYPE.SELL,
               quantityChange: data.quantity,
               previousQuantity: playerInventory.quantity,
               currentQuantity: playerInventory.quantity - data.quantity,
               timestamp: Date.now(),
             };
             player.coin += totalPrice;
+            player.capacity += parseInt(data.quantity);
             playerInventory.quantity -= data.quantity;
             playerInventory.save();
             player.save();
+            
 
             // await redisClient.set(transactionKey, JSON.stringify(transactionData));
 
