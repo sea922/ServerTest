@@ -2,7 +2,6 @@
 // third party components
 const Sequelize = require("sequelize");
 const async = require("async");
-const redis = require("redis");
 
 // our components
 const config = require("../configs/general.config");
@@ -14,9 +13,6 @@ const { redisClient, parseRedisResult, prepareRedisData, saveItemsToRedis, getPl
 const { produceMessage, processTransactions } = require("../utils/kafka");
 const Logger = require("../utils/logger.utils");
 
-// const redisClient = redis.createClient({
-//   socket: { host: `${process.env.REDIS_HOST}`, port: `${process.env.REDIS_PORT}` },
-// });
 
 module.exports = {
   getOneItemOfPlayer: async function (accessUserId, accessUserType, id, callback) {

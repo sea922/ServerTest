@@ -29,21 +29,6 @@ function prepareRedisData(items) {
 async function saveItemsToRedis(listItems) {
   for (const i of listItems) {
     const { id, name, description, type, metadata, sellPrice, buyPrice, createdBy, updatedBy, deletedBy, createdAt, updatedAt, deletedAt } = i.item;
-    // const keyValuePairs = [
-    //   'name', name,
-    //   'description', description,
-    //   'type', type,
-    //   'metadata', JSON.stringify(metadata),
-    //   'quantity', i.quantity,
-    //   'sellPrice', sellPrice,
-    //   'buyPrice', buyPrice,
-    //   "createdBy", createdBy,
-    //   "updatedBy", updatedBy,
-    //   "deletedBy", deletedBy,
-    //   "createdAt", createdAt,
-    //   "updatedAt", updatedAt,
-    //   "deletedAt", deletedAt
-    // ];
 
     const keyValuePairs = {
       'name': name,
