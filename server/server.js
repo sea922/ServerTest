@@ -8,6 +8,7 @@ const moment = require("moment-timezone");
 
 // our components
 const config = require("./app/configs/general.config");
+const {processTransactions} = require("./app/utils/kafka");
 
 const app = express();
 
@@ -78,6 +79,8 @@ require("./app/routes/index")(app); // initialize routes
 // require("./app/databases/mongoDB/index"); // initialize models
 require("./app/databases/postgreSQL/index"); // initialize models
 
+
+processTransactions();
 
 const Logger = require("./app/utils/logger.utils");
 

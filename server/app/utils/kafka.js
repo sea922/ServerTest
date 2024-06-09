@@ -1,4 +1,7 @@
 const { Kafka } = require("kafkajs");
+const { redisClient } = require("./redis");
+const Logger = require("./logger.utils");
+
 
 // Kafka connection
 const kafka = new Kafka({
@@ -7,7 +10,7 @@ const kafka = new Kafka({
 });
 
 const producer = kafka.producer();
-const consumer = kafka.consumer({ groupId: "game-group" });
+const consumer = kafka.consumer({ groupId: "inventory-group" });
 
 (async () => {
   await producer.connect();
@@ -18,26 +21,50 @@ const consumer = kafka.consumer({ groupId: "game-group" });
 
 
 async function produceMessage(topic, message) {
-  await producer.send({
-    topic: topic,
-    messages: [{ value: JSON.stringify(message) }],
-  });
-}
+  try {
+    await producer.send({
+      topic: topic,
+      messages: [{ value: JSON.stringify(message) }],
+    });
+    console.log("Message sent successfully!");
+  } catch (error) {
+    console.error("Error producing message:", error);
+    // Check if the error is
+    }
+  }
 
-async function consumeMessages() {
-  await consumer.subscribe({ topic: 'inventory_updates' });
+
+const processTransactions = async () => {
+  await consumer.connect();
+  await consumer.subscribe({ topic: 'inventory_updates', fromBeginning: true });
 
   await consumer.run({
-    eachMessage: async ({ topic, partition, message }) => {
-      const inventoryUpdate = JSON.parse(message.value.toString());
-      console.log('Received inventory update:', inventoryUpdate);
-      // Process inventory update
-    },
+      eachMessage: async ({ topic, partition, message }) => {
+        console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ =>> ", message.value);
+          try {
+              const transactionData = JSON.parse(message.value.toString());
+              // Process the transaction data and record inventory balance update history
+              const transactionKey = `transaction:${transactionData.timestamp}:${transactionData.updatedBy}`;
+              const transactionHistory = {
+                  action: transactionData.action,
+                  playerId: transactionData.playerId,
+                  itemId: transactionData.itemId,
+                  quantityChange: transactionData.quantityChange,
+                  previousQuantity: transactionData.previousQuantity,
+                  currentQuantity: transactionData.currentQuantity,
+              };
+
+              console.log(transactionHistory);
+              // await redisClient.set(transactionKey, JSON.stringify(transactionHistory));
+          } catch (error) {
+              Logger.error('Error processing transaction:'+ error);
+          }
+      },
   });
-}
+};
 
 
 module.exports = {
   produceMessage,
-  consumeMessages
+  processTransactions
 };

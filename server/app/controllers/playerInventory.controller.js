@@ -91,13 +91,13 @@ module.exports = {
     );
   },
 
-  update: function (req, res) {
+  sellItems: function (req, res) {
     const accessUserId = req.body.accessUserId || global.INFO.anonymousId;
     const accessUserType =
       req.body.accessUserType || constant.USER_TYPE_ENUM.ANONYMOUS;
     const id = req.params.id || "";
     const data = req.body || "";
-    playerInventoryManager.update(
+    playerInventoryManager.sellItems(
       accessUserId,
       accessUserType,
       id,

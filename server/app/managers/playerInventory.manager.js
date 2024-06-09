@@ -6,50 +6,76 @@ const redis = require("redis");
 
 // our components
 const config = require("../configs/general.config");
-const { PlayerInventory, Item } = require("../databases/postgreSQL/index");
+const { SystemInventory, PlayerInventory, Item, Player } = require("../databases/postgreSQL/index");
 const constant = require("../utils/constant.utils");
 const supporter = require("../utils/supporter.utils");
 const { pageableV2 } = require("../utils/pieces.utils");
 const { redisClient, parseRedisResult, prepareRedisData } = require("../utils/redis");
+const { produceMessage, processTransactions } = require("../utils/kafka");
+const Logger = require("../utils/logger.utils");
 
 // const redisClient = redis.createClient({
 //   socket: { host: `${process.env.REDIS_HOST}`, port: `${process.env.REDIS_PORT}` },
 // });
 
-
 module.exports = {
-
-  getOneItemOfPlayer: function (accessUserId, accessUserType, id, callback) {
+  getOneItemOfPlayer: async function (accessUserId, accessUserType, id, callback) {
     try {
       if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
         return callback(1, "permission_denied", 403, "permission denied", null);
       }
 
-      PlayerInventory.findOne({
+      const key = `player_inventory:${accessUserId}`;
+      let item = null;
+
+      try {
+        // Check Redis
+        const cachedResult = await redisClient.zRange(key, 0, -1, "WITHSCORES");
+        if (cachedResult && cachedResult.length > 0) {
+          const inventory = parseRedisResult(cachedResult);
+          item = inventory.rows.find((i) => i.item_id == id);
+
+          if (item) {
+            if (item.deletedAt != null) {
+              return callback(1, "deleted_result", 403, "item not exist", null);
+            }
+            return callback(null, null, 200, null, item);
+          }
+        }
+      } catch (err) {
+        Logger.error("Redis error: " + err);
+      }
+
+      const result = await PlayerInventory.findOne({
         where: { item_id: id, player_id: accessUserId },
         include: [
           {
             model: Item,
             as: "item",
-            attributes: ["id", "name", "description", "type","metadata"],
+            attributes: ["id", "name", "description", "type", "metadata"],
           },
         ],
-      })
-        .then(function (result) {
-          if (result) {
-            if (result.deletedAt != null) {
-              return callback(1, "deleted_result", 403, "item not exist", null);
-            }
-            return callback(null, null, 200, null, result);
-          } else {
-            return callback(1, "wrong_item", 400, "wrong item", null);
-          }
-        })
-        .catch(function (error) {
-          return callback(1, "query_fail", 400, error, null);
-        });
+      });
+
+      if (result) {
+        if (result.deletedAt != null) {
+          return callback(1, "deleted_result", 403, "item not exist", null);
+        }
+
+        try {
+          const redisData = { score: 0, value: JSON.stringify(result) };
+          await redisClient.zAdd(key, redisData);
+        } catch (err) {
+          Logger.error("error: " + err);
+        }
+
+        return callback(null, null, 200, null, result);
+      } else {
+        return callback(1, "wrong_item", 400, "wrong item", null);
+      }
     } catch (error) {
-      return callback(1, "get_user_fail", 400, error, null);
+      Logger.error("error: " + err);
+      return callback(1, "get_item_fail", 400, error, null);
     }
   },
 
@@ -58,7 +84,7 @@ module.exports = {
       if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
         return callback(1, "permission_denied", 403, "Permission denied", null);
       }
-  
+
       const key = `player_inventory:${accessUserId}:page:${pageNumber}:size:${pageSize}`;
       let inventory = null;
 
@@ -69,27 +95,27 @@ module.exports = {
       } else {
         const query = {
           where: {
-            player_id: accessUserId, 
+            player_id: accessUserId,
           },
           include: [
             {
               model: Item,
               as: "item",
-              attributes: ["id", "name", "description", "type","metadata"],
+              attributes: ["id", "name", "description", "type", "metadata"],
             },
           ],
         };
 
         supporter.pasteQuery(PlayerInventory, query, filter, sort, search, pageNumber, pageSize);
-  
+
         inventory = await PlayerInventory.findAndCountAll(query);
 
         // await redisClient.set(key, JSON.stringify(inventory));
-         // Convert the result to the format expected by zadd command
+        // Convert the result to the format expected by zadd command
         const redisData = prepareRedisData(inventory.rows);
         await redisClient.zAdd(key, redisData);
       }
-  
+
       const data = {
         data: inventory.rows,
         pagination: pageableV2(pageNumber, pageSize, inventory.count),
@@ -99,27 +125,24 @@ module.exports = {
           total: inventory.count,
         },
       };
-  
+
       return callback(null, null, 200, null, data);
     } catch (error) {
       return callback(1, "get_result_fail", 400, error.message, null);
     }
   },
-  
 
-  update: function (accessUserId, accessUserType, id, body, callback) {
+  sellItems: async function (accessUserId, accessUserType, id, body, callback) {
     try {
       if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
         return callback(1, "permission_denied", 403, "permission denied", null);
       }
-      //id -> playerId
 
       const data = {};
       data.updatedBy = accessUserId;
-      data.player_id = id;
-      if (body.item_id != "" && body.item_id != null) {
-        data.item_id = body.item_id;
-      }
+      data.playerId = accessUserId;
+      data.itemId = id;
+
       if (body.quantity != "" && body.quantity != null) {
         data.quantity = body.quantity;
       }
@@ -127,45 +150,73 @@ module.exports = {
       async.waterfall([
         // get result
         function (cb) {
-          PlayerInventory.findOne({
+          SystemInventory.findOne({
             where: {
-              player_id: data.player_id,
-              item_id: data.item_id
+              itemId: data.itemId,
             },
           }).then(function (result) {
-            data.price = result.price;
+            data.sellPrice = result.sellPrice;
             if (!result) {
               return callback(1, "wrong_update", 420, "wrong update", null);
             }
             return cb(null, result);
           });
         },
-        // update car
-        function (inventory, cb) {
-          PlayerInventory.build(data)
-            .validate()
-            .then(function () {
-              Object.assign(inventory, data);
-              inventory
-                .save({
-                  validate: false,
-                })
-                .then(function (result) {
-                  return callback(null, null, 200, null, result);
-                })
-                .catch(function (error) {
-                  return callback(true, "query_fail", 400, error, null);
-                });
-            })
-            .catch(function (validate) {
-              const errors = validate.errors.map(function (e) {
-                return {
-                  name: e.path,
-                  message: e.message,
-                };
-              });
-              return callback(1, "invalid_input", 403, errors, null);
+        // update
+        async function (inventory, cb) {
+          try {
+            // Validate and save player inventory
+            const playerInventory = await PlayerInventory.findOne({
+              where: { playerId: data.playerId, itemId: data.itemId },
             });
+            if (!playerInventory) {
+              return callback(1, "player_inventory_not_found", 404, "Player inventory not found", null);
+            }
+
+            const totalPrice = data.sellPrice * data.quantity;
+
+            // Update player balance
+            const player = await Player.findOne({
+              where: {
+                id: data.playerId,
+              },
+              attributes: ["id", "username", "coin"],
+            });
+            if (!player) {
+              return callback(1, "player_not_found", 404, "Player not found", null);
+            }
+
+
+            // Record transaction history
+            const transactionKey = `transaction:${Date.now()}:${accessUserId}`;
+            const transactionData = {
+              playerId: data.playerId,
+              itemId: data.itemId,
+              action: "sell",
+              quantityChange: data.quantity,
+              previousQuantity: playerInventory.quantity,
+              currentQuantity: playerInventory.quantity - data.quantity,
+              updatedBy: accessUserId,
+              timestamp: Date.now(),
+            };
+            player.coin += totalPrice;
+            playerInventory.quantity -= data.quantity;
+            playerInventory.save();
+            player.save();
+
+            console.log(JSON.stringify(transactionData));
+            // await redisClient.set(transactionKey, JSON.stringify(transactionData));
+
+            // Produce Kafka message
+            await produceMessage(
+              "inventory_updates",
+              transactionData,
+            );
+
+            return callback(null, null, 200, null, playerInventory);
+          } catch (error) {
+            return callback(1, "update_fail", 400, error, null);
+          }
         },
       ]);
     } catch (error) {

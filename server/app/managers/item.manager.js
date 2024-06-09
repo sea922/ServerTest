@@ -138,6 +138,14 @@ module.exports = {
       if (body.description != "" && body.description != null) {
         data.description = body.description;
       }
+      if (body.sellPrice != "" && body.sellPrice != null) {
+        data.sellPrice = body.sellPrice;
+      }
+
+      if (body.buyPrice != "" && body.buyPrice != null) {
+        data.buyPrice = body.buyPrice;
+      }
+
 
       async.waterfall([
         // get result
@@ -203,7 +211,7 @@ module.exports = {
       )
         .then(function (result) {
           if (!result[0]) {
-            return callback(1, "wrong_car", 403, "wrong car", null);
+            return callback(1, "wrong_item", 403, "wrong item", null);
           } else {
             return callback(null, null, 200, null, result);
           }
@@ -212,7 +220,7 @@ module.exports = {
           return callback(true, "query_fail", 400, error, null);
         });
     } catch (error) {
-      return callback(1, "delete_car_fail", 400, error, null);
+      return callback(1, "delete_item_fail", 400, error, null);
     }
   },
 };
