@@ -196,7 +196,6 @@ module.exports = {
               quantityChange: data.quantity,
               previousQuantity: playerInventory.quantity,
               currentQuantity: playerInventory.quantity - data.quantity,
-              updatedBy: accessUserId,
               timestamp: Date.now(),
             };
             player.coin += totalPrice;
@@ -204,7 +203,6 @@ module.exports = {
             playerInventory.save();
             player.save();
 
-            console.log(JSON.stringify(transactionData));
             // await redisClient.set(transactionKey, JSON.stringify(transactionData));
 
             // Produce Kafka message

@@ -1,6 +1,9 @@
 const { Kafka } = require("kafkajs");
+
+
 const { redisClient } = require("./redis");
 const Logger = require("./logger.utils");
+const { TransactionHistory } = require("../databases/postgreSQL/index");
 
 
 // Kafka connection
@@ -40,21 +43,23 @@ const processTransactions = async () => {
 
   await consumer.run({
       eachMessage: async ({ topic, partition, message }) => {
-        console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ =>> ", message.value);
           try {
               const transactionData = JSON.parse(message.value.toString());
               // Process the transaction data and record inventory balance update history
               const transactionKey = `transaction:${transactionData.timestamp}:${transactionData.updatedBy}`;
-              const transactionHistory = {
-                  action: transactionData.action,
+              const transactionBody = {
+                  // action: transactionData.action,
                   playerId: transactionData.playerId,
                   itemId: transactionData.itemId,
                   quantityChange: transactionData.quantityChange,
                   previousQuantity: transactionData.previousQuantity,
                   currentQuantity: transactionData.currentQuantity,
+                  createdAt: transactionData.timestamp,
               };
 
-              console.log(transactionHistory);
+              await TransactionHistory.create(
+                transactionBody,
+              );
               // await redisClient.set(transactionKey, JSON.stringify(transactionHistory));
           } catch (error) {
               Logger.error('Error processing transaction:'+ error);

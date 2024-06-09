@@ -61,7 +61,7 @@ module.exports = (database, DataTypes) => {
     },
     {
       sequelize: database,
-      tableName: "tbl_transaction_history",
+      tableName: "tbl_transactions_history",
       timestamps: false,
     }
   );
