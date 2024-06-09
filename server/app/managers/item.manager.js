@@ -23,6 +23,8 @@ module.exports = {
         description: data.description,
         type: data.type,
         metadata: data.metadata,
+        buyPrice: data.buyPrice,
+        sellPrice: data.sellPrice,
         createdBy: global.INFO.anonymousId,
         updatedBy: global.INFO.anonymousId,
       })
@@ -61,8 +63,8 @@ module.exports = {
       }
 
       Item.findOne({
-        attributes: ["id", "name", "description", "type", "metadata", "updatedBy", "createdAt", "updatedAt", "deleted"],
-        where: { item_id: id },
+        attributes: ["id", "name", "description", "type", "metadata", "buyPrice", "sellPrice", "updatedBy", "createdAt", "updatedAt", "deleted"],
+        where: { id: id },
       })
         .then(function (result) {
           if (result) {
@@ -92,7 +94,7 @@ module.exports = {
       }
 
       const query = {
-        attributes: ["id", "name", "description", "type", "metadata", "updatedBy", "createdAt", "updatedAt", "deleted"],
+        attributes: ["id", "name", "description", "type", "metadata", "buyPrice", "sellPrice", "updatedBy", "createdAt", "updatedAt", "deleted"],
         where: {
           deleted: constant.BOOLEAN_ENUM.FALSE,
         },

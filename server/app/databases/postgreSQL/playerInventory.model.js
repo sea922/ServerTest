@@ -38,10 +38,6 @@ module.exports = (database, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      sellPrice: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
       createdBy: {
         type: DataTypes.BIGINT,
         allowNull: true,

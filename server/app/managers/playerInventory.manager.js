@@ -6,7 +6,7 @@ const redis = require("redis");
 
 // our components
 const config = require("../configs/general.config");
-const { SystemInventory, PlayerInventory, Item, Player } = require("../databases/postgreSQL/index");
+const { PlayerInventory, Item, Player } = require("../databases/postgreSQL/index");
 const constant = require("../utils/constant.utils");
 const supporter = require("../utils/supporter.utils");
 const { pageableV2 } = require("../utils/pieces.utils");
@@ -33,7 +33,7 @@ module.exports = {
         const cachedResult = await redisClient.zRange(key, 0, -1, "WITHSCORES");
         if (cachedResult && cachedResult.length > 0) {
           const inventory = parseRedisResult(cachedResult);
-          item = inventory.rows.find((i) => i.item_id == id);
+          item = inventory.rows.find((i) => i.itemId == id);
 
           if (item) {
             if (item.deletedAt != null) {
@@ -47,7 +47,7 @@ module.exports = {
       }
 
       const result = await PlayerInventory.findOne({
-        where: { item_id: id, player_id: accessUserId },
+        where: { itemId: id, playerId: accessUserId },
         include: [
           {
             model: Item,
@@ -95,13 +95,14 @@ module.exports = {
       } else {
         const query = {
           where: {
-            player_id: accessUserId,
+            playerId: accessUserId,
+            deletedAt: null
           },
           include: [
             {
               model: Item,
               as: "item",
-              attributes: ["id", "name", "description", "type", "metadata"],
+              attributes: ["id", "name", "description", "type", "metadata", "sellPrice"],
             },
           ],
         };
@@ -132,7 +133,7 @@ module.exports = {
     }
   },
 
-  sellItems: async function (accessUserId, accessUserType, id, body, callback) {
+  sellItems: async function (accessUserId, accessUserType, body, callback) {
     try {
       if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
         return callback(1, "permission_denied", 403, "permission denied", null);
@@ -141,11 +142,17 @@ module.exports = {
       const data = {};
       data.updatedBy = accessUserId;
       data.playerId = accessUserId;
-      data.itemId = id;
 
+      if (body.itemId != "" && body.itemId != null) {
+        data.itemId = body.itemId;
+      }
       if (body.quantity != "" && body.quantity != null) {
         data.quantity = body.quantity;
       }
+
+      if (!data.itemId || !body.quantity) {
+        return callback(1, "missing", 403, "Please provide itemId, and quantity", null);
+    }
 
       async.waterfall([
         // get result
@@ -189,6 +196,14 @@ module.exports = {
 
             // Record transaction history
             const transactionKey = `transaction:${Date.now()}:${accessUserId}`;
+            player.coin += totalPrice;
+            player.capacity += parseInt(data.quantity);
+            playerInventory.quantity -= data.quantity;
+            playerInventory.save();
+            player.save();
+
+
+
             const transactionData = {
               playerId: data.playerId,
               itemId: data.itemId,
@@ -197,12 +212,8 @@ module.exports = {
               previousQuantity: playerInventory.quantity,
               currentQuantity: playerInventory.quantity - data.quantity,
               timestamp: Date.now(),
+              // dataChange: ItemData
             };
-            player.coin += totalPrice;
-            player.capacity += parseInt(data.quantity);
-            playerInventory.quantity -= data.quantity;
-            playerInventory.save();
-            player.save();
             
 
             // await redisClient.set(transactionKey, JSON.stringify(transactionData));

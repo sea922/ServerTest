@@ -95,12 +95,10 @@ module.exports = {
     const accessUserId = req.body.accessUserId || global.INFO.anonymousId;
     const accessUserType =
       req.body.accessUserType || constant.USER_TYPE_ENUM.ANONYMOUS;
-    const id = req.params.id || "";
     const data = req.body || "";
     playerInventoryManager.sellItems(
       accessUserId,
       accessUserType,
-      id,
       data,
       function (errorCode, errorMessage, httpCode, errorDescription, result) {
         if (errorCode) {

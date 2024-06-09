@@ -28,6 +28,14 @@ module.exports = {
         type: Sequelize.DataTypes.JSON,
         allowNull: true,
       },
+      buyPrice: {
+        type: Sequelize.DataTypes.INTEGER,
+        allowNull: false,
+      },
+      sellPrice: {
+        type: Sequelize.DataTypes.INTEGER,
+        allowNull: false,
+      },
       deleted: {
         type: Sequelize.DataTypes.BOOLEAN,
         defaultValue: constant.BOOLEAN_ENUM.FALSE,
