@@ -155,16 +155,16 @@ module.exports = {
               itemId: data.itemId,
             },
           }).then(function (result) {
-            data.sellPrice = result.sellPrice;
             if (!result) {
-              return callback(1, "wrong_update", 420, "wrong update", null);
+              return callback(1, "wrong_update", 420, "item does not exist", null);
             }
             return cb(null, result);
           });
         },
         // update
-        async function (inventory, cb) {
+        async function (result, cb) {
           try {
+            data.sellPrice = result.sellPrice;
             // Validate and save player inventory
             const playerInventory = await PlayerInventory.findOne({
               where: { playerId: data.playerId, itemId: data.itemId },
