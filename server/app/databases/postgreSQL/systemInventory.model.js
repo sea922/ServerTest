@@ -10,7 +10,7 @@ module.exports = (database, DataTypes) => {
     static associate(models) {
       models.SystemInventory.belongsTo(models.Item, {
         as: "item",
-        foreignKey: "item_id",
+        foreignKey: "itemId",
       });
     }
   }
@@ -22,15 +22,15 @@ module.exports = (database, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      player_id: {
+      itemId: {
         type: DataTypes.BIGINT,
         allowNull: false,
       },
-      item_id: {
-        type: DataTypes.BIGINT,
+      buyPrice: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
-      price: {
+      sellPrice: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },

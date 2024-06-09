@@ -10,15 +10,15 @@ module.exports = (database, DataTypes) => {
     static associate(models) {
       models.Item.hasMany(models.TransactionHistory, {
         as: "transactions",
-        foreignKey: "item_id",
+        foreignKey: "itemId",
       });
       models.Item.hasMany(models.PlayerInventory, {
         as: "list_player_items",
-        foreignKey: "item_id",
+        foreignKey: "itemId",
       });
       models.Item.hasMany(models.SystemInventory, {
         as: "list_system_items",
-        foreignKey: "item_id",
+        foreignKey: "itemId",
       });
     }
   }

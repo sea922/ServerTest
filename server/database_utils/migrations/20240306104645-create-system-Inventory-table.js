@@ -12,15 +12,15 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
       },
-      player_id: {
+      itemId: {
         type: Sequelize.DataTypes.BIGINT,
         allowNull: false,
       },
-      item_id: {
-        type: Sequelize.DataTypes.BIGINT,
+      buyPrice: {
+        type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
       },
-      price: {
+      sellPrice: {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
       },

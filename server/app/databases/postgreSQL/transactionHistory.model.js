@@ -11,11 +11,11 @@ module.exports = (database, DataTypes) => {
       // Define associations if needed
       models.TransactionHistory.belongsTo(models.Player, {
         as: "player",
-        foreignKey: "player_id",
+        foreignKey: "playerId",
       });
       models.TransactionHistory.belongsTo(models.Item, {
         as: "item",
-        foreignKey: "item_id",
+        foreignKey: "itemId",
       });
     }
   }
@@ -28,23 +28,23 @@ module.exports = (database, DataTypes) => {
         autoIncrement: true,
         allowNull: false,
       },
-      player_id: {
+      playerId: {
         type: DataTypes.BIGINT,
         allowNull: false,
       },
-      item_id: {
+      itemId: {
         type: DataTypes.BIGINT,
         allowNull: false,
       },
-      quantity_change: {
+      quantityChange: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      previous_quantity: {
+      previousQuantity: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      current_quantity: {
+      currentQuantity: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },

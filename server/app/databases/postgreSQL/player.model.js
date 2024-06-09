@@ -15,11 +15,11 @@ module.exports = (database, DataTypes) => {
     static associate(models) {
       models.Player.hasMany(models.TransactionHistory, {
         as: "transactions",
-        foreignKey: "player_id",
+        foreignKey: "playerId",
       });
       models.Player.hasMany(models.PlayerInventory, {
         as: "player_inventory_items",
-        foreignKey: "player_id",
+        foreignKey: "playerId",
       });
     }
 
@@ -48,16 +48,16 @@ module.exports = (database, DataTypes) => {
 
     static signToken(user) {
       return jsonWebToken.sign(
-          {
-            id: user.id,
-            username: user.username,
-            method: user.method,
-            type: user.type,
-          },
-          config.jwtAuthKey,
-          {
-            expiresIn: config.tokenLoginExpiredDays,
-          },
+        {
+          id: user.id,
+          username: user.username,
+          method: user.method,
+          type: user.type,
+        },
+        config.jwtAuthKey,
+        {
+          expiresIn: config.tokenLoginExpiredDays,
+        }
       );
     }
 
@@ -67,13 +67,13 @@ module.exports = (database, DataTypes) => {
 
     generateSecretKey() {
       return jsonWebToken.sign(
-          {
-            id: this.id,
-            username: this.username,
-            method: this.method,
-            type: this.type,
-          },
-          config.jwtAuthKey,
+        {
+          id: this.id,
+          username: this.username,
+          method: this.method,
+          type: this.type,
+        },
+        config.jwtAuthKey
       );
     }
 
@@ -87,33 +87,33 @@ module.exports = (database, DataTypes) => {
   }
 
   Player.init(
-      {
-        id: {
-          type: DataTypes.BIGINT,
-          autoIncrement: true,
-          allowNull: false,
-          primaryKey: true,
-        },
-        username: {
-          type: DataTypes.STRING(64),
-          allowNull: false,
-          unique: true,
-          validate: {
-            is: {
-              args: /^[a-zA-Z0-9]+$/i,
-              msg: 'username must contain only alphabet letters and numbers',
-            },
-            len: {
-              args: [4, 64],
+    {
+      id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true,
+      },
+      username: {
+        type: DataTypes.STRING(64),
+        allowNull: false,
+        unique: true,
+        validate: {
+          is: {
+            args: /^[a-zA-Z0-9]+$/i,
+            msg: "username must contain only alphabet letters and numbers",
+          },
+          len: {
+            args: [4, 64],
             msg: "username must between 4 and 64 characters",
           },
           isUnique: function (value, next) {
             User.findOne({
               where: {
-                  id: {[Sequelize.Op.ne]: this.id},
-                  username: value,
-                  deleted: constant.BOOLEAN_ENUM.FALSE,
-                },
+                id: { [Sequelize.Op.ne]: this.id },
+                username: value,
+                deleted: constant.BOOLEAN_ENUM.FALSE,
+              },
               attributes: ["id"],
             }).then(function (result) {
               if (result) {
@@ -216,7 +216,9 @@ module.exports = (database, DataTypes) => {
   });
 
   Player.beforeUpdate(function (player, options, next) {
-    player.password = Player.hashPassword(player.password);
+    if (!player.coin) {
+      player.password = Player.hashPassword(player.password);
+    }
   });
 
   return Player;

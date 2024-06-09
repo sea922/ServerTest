@@ -12,11 +12,11 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
       },
-      player_id: {
+      playerId: {
         type: Sequelize.DataTypes.BIGINT,
         allowNull: false,
       },
-      item_id: {
+      itemId: {
         type: Sequelize.DataTypes.BIGINT,
         allowNull: false,
       },
@@ -24,7 +24,7 @@ module.exports = {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
       },
-      price: {
+      sellPrice: {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
       },

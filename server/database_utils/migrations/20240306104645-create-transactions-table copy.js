@@ -12,23 +12,23 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
       },
-      player_id: {
+      playerId: {
         type: Sequelize.DataTypes.BIGINT,
         allowNull: false,
       },
-      item_id: {
+      itemId: {
         type: Sequelize.DataTypes.BIGINT,
         allowNull: false,
       },
-      quantity_change: {
+      quantityChange: {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
       },
-      previous_quantity: {
+      previousQuantity: {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
       },
-      current_quantity: {
+      currentQuantity: {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false
       },
