@@ -141,7 +141,7 @@ module.exports = {
             {
               model: Item,
               as: "item",
-              attributes: ["id", "name", "description"],
+              attributes: ["id", "name", "description", "type","metdata"],
             },
           ],
         };
@@ -172,21 +172,19 @@ module.exports = {
 
   update: function (accessUserId, accessUserType, id, body, callback) {
     try {
-      if (accessUserType < constant.USER_TYPE_ENUM.MANAGER) {
+      if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
         return callback(1, "permission_denied", 403, "permission denied", null);
       }
       //id -> playerId
 
       const data = {};
       data.updatedBy = accessUserId;
+      data.player_id = id;
       if (body.item_id != "" && body.item_id != null) {
         data.item_id = body.item_id;
       }
       if (body.quantity != "" && body.quantity != null) {
         data.quantity = body.quantity;
-      }
-      if (body.price != "" && body.price != null) {
-        data.price = body.price;
       }
 
       async.waterfall([
@@ -194,9 +192,11 @@ module.exports = {
         function (cb) {
           PlayerInventory.findOne({
             where: {
-              player_id: id,
+              player_id: data.player_id,
+              item_id: data.item_id
             },
           }).then(function (result) {
+            data.price = result.price;
             if (!result) {
               return callback(1, "wrong_update", 420, "wrong update", null);
             }

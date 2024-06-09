@@ -113,10 +113,10 @@ module.exports = {
           );
         }
         const resData = {};
-        resData.id = result.id;
-        resData.carId = result.carId;
-        resData.criteriaId = result.criteriaId;
-        resData.note = result.note;
+        resData.playerInventoryId = result.id;
+        resData.item_id = result.item_id;
+        resData.player_id = result.player_id;
+        resData.quantity = result.quantity;
         return rest.sendSuccessOne(res, resData, httpCode);
       }
     );
