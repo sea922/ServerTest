@@ -10,6 +10,7 @@ const { ItemDetail } = require("../databases/postgreSQL/index");
 const constant = require("../utils/constant.utils");
 const supporter = require("../utils/supporter.utils");
 const { pageableV2 } = require("../utils/pieces.utils");
+const { redisClient, updateItem, parseRedisResult } = require("../utils/redis");
 
 module.exports = {
   create: function (accessUserId, accessUserType, data, callback) {
@@ -84,42 +85,63 @@ module.exports = {
     }
   },
 
-  getAll: function (accessUserId, accessUserType, filter, sort, search, pageNumber, pageSize, callback) {
+  getAll: async function (accessUserId, accessUserType, filter, sort, search, pageNumber, pageSize, callback) {
     try {
       // Check user permissions
-
       if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
-        return callback(1, "permission_denied", 403, "permission denied", null);
+        return callback(1, "permission_denied", 403, "Permission denied", null);
       }
 
-      const query = {
-        attributes: ["id", "name", "description", "type", "metadata", "buyPrice", "sellPrice", "updatedBy", "createdAt", "updatedAt", "deleted"],
-        where: {
-          deleted: constant.BOOLEAN_ENUM.FALSE,
-        },
-      };
+      let listItems = null;
+      const key = `list_items`;
+      const cachedResult = await redisClient.get(key);
 
-      supporter.pasteQuery(Item, query, filter, sort, search, pageNumber, pageSize);
+      if (cachedResult && cachedResult.count > 0) {
+        listItems = parseRedisResult(cachedResult);
+        const data = {
+          data: listItems.rows,
+          pagination: pageableV2(pageNumber, pageSize, listItems.count),
+          items: {
+            begin: pageNumber * pageSize - pageSize + 1,
+            end: Math.min(pageNumber * pageSize, listItems.count),
+            total: listItems.count,
+          },
+        };
+        return callback(null, null, 200, null, data);
+      } else {
+        const query = {
+          attributes: ["id", "name", "description", "type", "metadata", "buyPrice", "sellPrice", "updatedBy", "createdAt", "updatedAt", "deleted"],
+          where: {
+            deleted: constant.BOOLEAN_ENUM.FALSE,
+          },
+        };
 
-      Item.findAndCountAll(query)
-        .then(function (result) {
-          const foundItemList = result.rows;
-          const data = {
-            data: foundItemList,
-            pagination: pageableV2(pageNumber, pageSize, result.count),
-            items: {
-              begin: pageNumber * pageSize - pageSize + 1,
-              end: pageNumber * pageSize,
-              total: result.count,
-            },
-          };
-          return callback(null, null, 200, null, data);
-        })
-        .catch(function (error) {
-          return callback(1, "query_fail", 400, error.message, null);
-        });
+        supporter.pasteQuery(Item, query, filter, sort, search, pageNumber, pageSize);
+
+        Item.findAndCountAll(query)
+          .then(function (result) {
+            const foundItemList = result.rows;
+            const data = {
+              data: foundItemList,
+              pagination: pageableV2(pageNumber, pageSize, result.count),
+              items: {
+                begin: pageNumber * pageSize - pageSize + 1,
+                end: Math.min(pageNumber * pageSize, result.count),
+                total: result.count,
+              },
+            };
+
+            // Cache the data in Redis
+            const serializedData = JSON.stringify(data);
+            redisClient.set(key, serializedData);
+
+            return callback(null, null, 200, null, data);
+          })
+          .catch(function (error) {
+            return callback(1, "query_fail", 400, error.message, null);
+          });
+      }
     } catch (error) {
-      // Handle unexpected errors
       return callback(1, "get_item_fail", 400, error.message, null);
     }
   },
@@ -146,7 +168,6 @@ module.exports = {
       if (body.buyPrice != "" && body.buyPrice != null) {
         data.buyPrice = body.buyPrice;
       }
-
 
       async.waterfall([
         // get result
