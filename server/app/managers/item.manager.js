@@ -88,7 +88,6 @@ module.exports = {
     try {
       // Check user permissions
 
-      console.log(accessUserType);
       if (accessUserType < constant.USER_TYPE_ENUM.END_USER) {
         return callback(1, "permission_denied", 403, "permission denied", null);
       }

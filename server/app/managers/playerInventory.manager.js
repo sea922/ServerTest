@@ -10,7 +10,7 @@ const { PlayerInventory, Item, Player } = require("../databases/postgreSQL/index
 const constant = require("../utils/constant.utils");
 const supporter = require("../utils/supporter.utils");
 const { pageableV2 } = require("../utils/pieces.utils");
-const { redisClient, parseRedisResult, prepareRedisData } = require("../utils/redis");
+const { redisClient, parseRedisResult, prepareRedisData, saveItemsToRedis, getPlayerItems, updateItem } = require("../utils/redis");
 const { produceMessage, processTransactions } = require("../utils/kafka");
 const Logger = require("../utils/logger.utils");
 
@@ -85,24 +85,22 @@ module.exports = {
         return callback(1, "permission_denied", 403, "Permission denied", null);
       }
 
-      const key = `player_inventory:${accessUserId}:page:${pageNumber}:size:${pageSize}`;
       let inventory = null;
-
       // const cachedResult = await redisClient.get(key);
-      const cachedResult = await redisClient.zRange(key, (pageNumber - 1) * pageSize, pageNumber * pageSize - 1, "WITHSCORES");
-      if (cachedResult && cachedResult.length > 0) {
-        inventory = parseRedisResult(cachedResult);
+      const cachedResult = await getPlayerItems(accessUserId);
+      if (cachedResult && cachedResult.count > 0) {
+        inventory = cachedResult;
       } else {
         const query = {
           where: {
             playerId: accessUserId,
-            deletedAt: null
+            deletedAt: null,
           },
           include: [
             {
               model: Item,
               as: "item",
-              attributes: ["id", "name", "description", "type", "metadata", "sellPrice"],
+              attributes: ["id", "name", "description", "type", "metadata", "sellPrice", "buyPrice"],
             },
           ],
         };
@@ -111,10 +109,9 @@ module.exports = {
 
         inventory = await PlayerInventory.findAndCountAll(query);
 
-        // await redisClient.set(key, JSON.stringify(inventory));
-        // Convert the result to the format expected by zadd command
-        const redisData = prepareRedisData(inventory.rows);
-        await redisClient.zAdd(key, redisData);
+        const listItems = inventory.rows;
+        saveItemsToRedis(listItems);
+        // await redisClient.zAdd(key, redisData);
       }
 
       const data = {
@@ -152,14 +149,14 @@ module.exports = {
 
       if (!data.itemId || !body.quantity) {
         return callback(1, "missing", 403, "Please provide itemId, and quantity", null);
-    }
+      }
 
       async.waterfall([
         // get result
         function (cb) {
-          SystemInventory.findOne({
+          Item.findOne({
             where: {
-              itemId: data.itemId,
+              id: data.itemId,
             },
           }).then(function (result) {
             if (!result) {
@@ -193,7 +190,6 @@ module.exports = {
               return callback(1, "player_not_found", 404, "Player not found", null);
             }
 
-
             // Record transaction history
             const transactionKey = `transaction:${Date.now()}:${accessUserId}`;
             player.coin += totalPrice;
@@ -201,7 +197,6 @@ module.exports = {
             playerInventory.quantity -= data.quantity;
             playerInventory.save();
             player.save();
-
 
 
             const transactionData = {
@@ -214,15 +209,17 @@ module.exports = {
               timestamp: Date.now(),
               // dataChange: ItemData
             };
-            
+
+            const updatedItemData = {
+              quantity: playerInventory.quantity,
+          };
+
+            await updateItem(data.itemId, updatedItemData)
 
             // await redisClient.set(transactionKey, JSON.stringify(transactionData));
 
             // Produce Kafka message
-            await produceMessage(
-              "inventory_updates",
-              transactionData,
-            );
+            await produceMessage("inventory_updates", transactionData);
 
             return callback(null, null, 200, null, playerInventory);
           } catch (error) {
