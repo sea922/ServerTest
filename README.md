@@ -24,6 +24,11 @@ REST API
 ![DB](/assets/DB_desgn.jpeg)
 
 
+## Demo
+Click [here](https://drive.google.com/file/d/19cVhdwCReszzvhj_RVhPevrKwyn4NbvB/view?usp=sharing) to view the demo.
+
+
+
 # Solution
 
 - System architecture: Both Monolithic and Microservices are possible but I choose Monolithic (The time is 3 days, I am not confident to use Microservices)
@@ -208,10 +213,6 @@ Delete item
 **Method:** `DELETE`
 
 **Endpoint:** `/api/v1/auth/player-inventories/items/:id`
-
-# Demo
-Click [here](https://drive.google.com/file/d/19cVhdwCReszzvhj_RVhPevrKwyn4NbvB/view?usp=sharing) to view the demo.
-
 
 
 
