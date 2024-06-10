@@ -36,6 +36,8 @@ module.exports = {
               validate: false,
             })
             .then(function (result) {
+              const key = `listItem`;
+
               return callback(null, null, 200, null, result);
             })
             .catch(function (error) {
