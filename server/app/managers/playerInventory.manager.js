@@ -280,7 +280,7 @@ module.exports = {
               attributes: ["id", "username", "coin", "capacity"],
             });
             if (!player) {
-              return callback(1, "item_purchase_failed", 404, "Item purchase failed", null);
+              return callback(1, "item_purchase_failed", 404, "Not enough coin or capacity", null);
             }
 
             let playerInventory = await PlayerInventory.findOne({
