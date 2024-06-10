@@ -64,6 +64,159 @@ REST API
             - Update the player's changed item in Redis.
             - Kafka creates a transaction record.
 - **Transaction history:** Kafka takes care of the message queue to create records
+
+
+
+# **Main API**
+`Here I list some of the system's main APIs, all APIs are in the Postman Collection. Scroll down to get this collection`
+
+
+### Get Item Inventory
+
+Use this endpoint to retrieve the item inventory for a player.
+
+**Method:** `GET`
+
+**Endpoint:** `/api/v1/auth/player-inventories`
+
+**Response:** 
+    
+    "data": [
+        {
+            "id": "13",
+            "playerId": 2,
+            "itemId": "13",
+            "quantity": "1",
+            "item": {
+                "id": "13",
+                "name": "Ice Scroll",
+                "description": "Casts an ice spell.",
+                "type": "Scroll",
+                "metadata": {
+                    "spell": "Ice Shard",
+                    "power": "Medium",
+                    "range": "Short"
+                },
+                "sellPrice": "4",
+                "buyPrice": "220"
+            }
+        },
+        {
+            "id": "14",
+            "playerId": 2,
+            "itemId": "14",
+            "quantity": "1",
+            "item": {
+                "id": "14",
+                "name": "Teleport Scroll",
+                "description": "Teleports the user to a specified location.",
+                "type": "Scroll",
+                "metadata": {
+                    "destination": "Town Square",
+                    "range": "Long"
+                },
+                "sellPrice": "4",
+                "buyPrice": "220"
+            }
+        }
+    ],
+    "pagination": {
+        "currentPage": 1,
+        "prevPage": null,
+        "nextPage": null,
+        "beginPage": 1,
+        "endPage": 1,
+        "listPage": [
+            1
+        ],
+        "totalPage": 1,
+        "hasPrev": false,
+        "hasNext": false
+    },
+    "items": {
+        "begin": 1,
+        "end": 6,
+        "total": 6
+    },
+    "message": "",
+    "result": "ok"
+
+
+### Get Item Inventory
+
+Use this endpoint to retrieve the item inventory for a player.
+
+**Method:** `GET`
+
+**Endpoint:** `/api/v1/auth/player-inventories`
+
+
+### Sell Item
+
+Use this endpoint to sell item.
+
+**Method:** `POST`
+
+**Endpoint:** `/api/v1/auth/player-inventories/sell`
+
+**Response:** 
+{
+
+    "data": {
+        "item_id": "6",
+        "player_id": "2",
+        "quantity": "33"
+    },
+    "message": "",
+    "result": "ok"
+}
+
+### Buy Item
+
+Use this endpoint to sell item.
+
+**Method:** `POST`
+
+**Endpoint:** `/api/v1/auth/player-inventories/buy`
+
+**Response:** 
+{
+  
+    "data": {
+        "item_id": "11",
+        "player_id": "2",
+        "quantity": "1"
+    },
+    "message": "",
+    "result": "ok"
+}
+
+### CRUD Item
+
+Get all items in the system.
+
+**Method:** `GET`
+
+**Endpoint:** `/api/v1/auth/player-inventories/items`
+
+Create a new item
+
+**Method:** `POST`
+
+**Endpoint:** `/api/v1/auth/player-inventories/items`
+
+Update item
+
+**Method:** `PATCH`
+
+**Endpoint:** `/api/v1/auth/player-inventories/items/:id`
+
+Delete item
+
+**Method:** `DELETE`
+
+**Endpoint:** `/api/v1/auth/player-inventories/items/:id`
+
 # Demo
 Click to view
 
