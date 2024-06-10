@@ -17,11 +17,11 @@
 
 REST API 
 
-![DB](/Design.png)
+![DB](/assets/Design.png)
 
 ## Database
 
-![DB](DB_desgn.jpeg)
+![DB](/assets/DB_desgn.jpeg)
 
 
 # Solution
@@ -128,6 +128,10 @@ npx sequelize-cli db:seed:all
 Final Step:
 
 Open [http://localhost:7500](http://localhost:7500) => API
+
+#### Postman Collection:  
+
+[Open Collection Folder](./assets/Game_Server.postman_collection.json)
 
 
 

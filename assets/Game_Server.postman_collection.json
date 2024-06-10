@@ -1,0 +1,564 @@
+{
+	"info": {
+		"_postman_id": "46dd2896-454e-4f47-9644-ee48e9cbfe70",
+		"name": "Game Server",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15929176",
+		"_collection_link": "https://warped-sunset-724648.postman.co/workspace/SAI_ENGINES~505ac8e7-a0cd-43f4-9596-1d4e6447b20b/collection/15929176-46dd2896-454e-4f47-9644-ee48e9cbfe70?action=share&source=collection_link&creator=15929176"
+	},
+	"item": [
+		{
+			"name": "Player",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username_or_email\": \"player2\",\r\n    \"password\": \"player2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7500/api/v1/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7500",
+							"path": [
+								"api",
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get information",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMiLCJ1c2VybmFtZSI6InBsYXllcjIiLCJ0eXBlIjoyLCJpYXQiOjE3MTgwMTA3NTAsImV4cCI6MTcyMDE3MDc1MH0.plIDmJ3S258w4As-2G343ZGdCUde6XVZcfv7fdqagdk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:7500/api/v1/auth/me",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7500",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetOne",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImFkbWluIiwidHlwZSI6NSwiaWF0IjoxNzE4MDEwODg0LCJleHAiOjE3MjAxNzA4ODR9.687Sc1xXcpn5z-XLZA33uejZ2_vdnDhpTHfuaTVquTw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Health Potion\",\r\n    \"type\": \"Potion\",\r\n    \"description\": \"Restores health over time.\",\r\n    \"quantity\": 10,\r\n    \"metadata\": {\r\n        \"effect\": \"Heal 50 HP\",\r\n        \"duration\": \"30 seconds\",\r\n        \"color\": \"Red\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7500/api/v1/auth/players/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7500",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"players",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete item",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwidHlwZSI6NSwiaWF0IjoxNzE3ODU5MTM1LCJleHAiOjE3MjAwMTkxMzV9.UWpgt_cvwEXQUiXOYyXZfbhaOj5T7QZQkGY7yFZeoT8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7500/api/v1/auth/players/16",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7500",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"players",
+								"16"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Inventory Player",
+			"item": [
+				{
+					"name": "Get Item Inventory",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InBsYXllcjEiLCJ0eXBlIjoyLCJpYXQiOjE3MTc4NDQzNjgsImV4cCI6MTcyMDAwNDM2OH0.cGLdnNhbpfOGs0Zk0NuSgT9TCbyZ_HMejI-OS8x-xNk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Teleport Scroll1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7500/api/v1/auth/player-inventories",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7500",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"player-inventories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetOnePlayerItem",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InBsYXllcjEiLCJ0eXBlIjoyLCJpYXQiOjE3MTc4NDQzNjgsImV4cCI6MTcyMDAwNDM2OH0.cGLdnNhbpfOGs0Zk0NuSgT9TCbyZ_HMejI-OS8x-xNk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Teleport Scroll1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7500/api/v1/auth/player-inventories",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7500",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"player-inventories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sell item",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InBsYXllcjEiLCJ0eXBlIjoyLCJpYXQiOjE3MTc4NDQzNjgsImV4cCI6MTcyMDAwNDM2OH0.cGLdnNhbpfOGs0Zk0NuSgT9TCbyZ_HMejI-OS8x-xNk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"quantity\": \"4\",\r\n    \"itemId\": \"6\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7500/api/v1/auth/player-inventories/sell",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7500",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"player-inventories",
+								"sell"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buy item",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InBsYXllcjEiLCJ0eXBlIjoyLCJpYXQiOjE3MTc4NDQzNjgsImV4cCI6MTcyMDAwNDM2OH0.cGLdnNhbpfOGs0Zk0NuSgT9TCbyZ_HMejI-OS8x-xNk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"quantity\": \"1\",\r\n    \"itemId\": \"55\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7500/api/v1/auth/player-inventories/buy",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7500",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"player-inventories",
+								"buy"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "(Manager) Update Invent Player",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InBsYXllcjEiLCJ0eXBlIjoyLCJpYXQiOjE3MTc4NDQzNjgsImV4cCI6MTcyMDAwNDM2OH0.cGLdnNhbpfOGs0Zk0NuSgT9TCbyZ_HMejI-OS8x-xNk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"item_id\": \"7\",\r\n    \"quantity\": \"4\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7500/api/v1/auth/player-inventories/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7500",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"player-inventories",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Item",
+			"item": [
+				{
+					"name": "Create Item",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwidHlwZSI6NSwiaWF0IjoxNzE3ODU5MTM1LCJleHAiOjE3MjAwMTkxMzV9.UWpgt_cvwEXQUiXOYyXZfbhaOj5T7QZQkGY7yFZeoT8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Health Potion\",\r\n    \"type\": \"Potion\",\r\n    \"description\": \"Restores health over time.\",\r\n    \"quantity\": 10,\r\n    \"metadata\": {\r\n        \"effect\": \"Heal 50 HP\",\r\n        \"duration\": \"30 seconds\",\r\n        \"color\": \"Red\"\r\n    },\r\n    \"buyPrice\": \"1000\",\r\n    \"sellPrice\": \"100\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7500/api/v1/auth/items",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7500",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete item",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwidHlwZSI6NSwiaWF0IjoxNzE3ODU5MTM1LCJleHAiOjE3MjAwMTkxMzV9.UWpgt_cvwEXQUiXOYyXZfbhaOj5T7QZQkGY7yFZeoT8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7500/api/v1/auth/items/16",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7500",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"items",
+								"16"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get lis item",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwidHlwZSI6NSwiaWF0IjoxNzE3ODU5MTM1LCJleHAiOjE3MjAwMTkxMzV9.UWpgt_cvwEXQUiXOYyXZfbhaOj5T7QZQkGY7yFZeoT8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7500/api/v1/auth/items",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7500",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get One Item",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwidHlwZSI6NSwiaWF0IjoxNzE3ODU5MTM1LCJleHAiOjE3MjAwMTkxMzV9.UWpgt_cvwEXQUiXOYyXZfbhaOj5T7QZQkGY7yFZeoT8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7500/api/v1/auth/items/15",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7500",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"items",
+								"15"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
