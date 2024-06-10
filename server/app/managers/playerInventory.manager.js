@@ -321,6 +321,7 @@ module.exports = {
                 createdBy: global.INFO.anonymousId,
                 updatedBy: global.INFO.anonymousId,
               });
+              console.log("MNENEENENENNEENEN");
               await addItemToPlayerInventory(data.playerId, data.itemId, data.quantity, {
                 name: data.name,
                 description: data.description,

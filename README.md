@@ -142,14 +142,6 @@ Use this endpoint to retrieve the item inventory for a player.
     "result": "ok"
 
 
-### Get Item Inventory
-
-Use this endpoint to retrieve the item inventory for a player.
-
-**Method:** `GET`
-
-**Endpoint:** `/api/v1/auth/player-inventories`
-
 
 ### Sell Item
 
@@ -218,9 +210,7 @@ Delete item
 **Endpoint:** `/api/v1/auth/player-inventories/items/:id`
 
 # Demo
-Click to view
-
-
+Click [here](https://drive.google.com/file/d/19cVhdwCReszzvhj_RVhPevrKwyn4NbvB/view?usp=sharing) to view the demo.
 
 
 

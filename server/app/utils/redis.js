@@ -31,6 +31,7 @@ async function saveItemsToRedis(listItems) {
     const { id, name, description, type, metadata, sellPrice, buyPrice, createdBy, updatedBy, deletedBy, createdAt, updatedAt, deletedAt } = i.item;
 
     const keyValuePairs = {
+      'id': id,
       'name': name,
       'description': description,
       'type': type,
@@ -50,9 +51,10 @@ async function saveItemsToRedis(listItems) {
       await redisClient.hSet(`item:${id}`, keyValuePairs);
       Logger.info(`Item ${id} saved to Redis.`);
       await redisClient.zAdd(`player_inventory:${i.playerId}`, {
-        score: Date.now(),
+        score: -Date.now(), // descending order
         value: id,
       });
+      
     } catch (error) {
       Logger.error(`Error saving item ${id} to Redis:` + error);
     }
@@ -166,8 +168,12 @@ async function addItemToPlayerInventory(playerId, itemId, quantity, itemDetails)
     const playerInventoryKey = `player_inventory:${playerId}`;
     const itemKey = `item:${itemId}`;
 
-    await redisClient.zAdd(playerInventoryKey, Date.now(), itemId);
+    await redisClient.zAdd(playerInventoryKey, {
+      score: Date.now(), 
+      value: itemId
+    });
     Logger.info(`Item with ID ${itemId} added to player ${playerId}'s inventory.`);
+
 
     if (itemDetails) {
       const hashFields = {
@@ -188,6 +194,7 @@ async function addItemToPlayerInventory(playerId, itemId, quantity, itemDetails)
       message: `Item with ID ${itemId} added to player ${playerId}'s inventory.`,
     };
   } catch (error) {
+    console.log(error);
     return {
       success: false,
       message: `Error adding item with ID ${itemId} to player ${playerId}'s inventory: ${error.message}`,
