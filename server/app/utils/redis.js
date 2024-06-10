@@ -101,7 +101,7 @@ async function updateItem(itemId, updatedItem) {
   try {
       const itemExists = await redisClient.exists(`item:${itemId}`);
       if (!itemExists) {
-          throw new Error(`Item with ID ${itemId} does not exist.`);
+          Logger.info(`Item with ID ${itemId} does not exist.`);
       }
 
       const keyValuePairs = [];
@@ -125,6 +125,77 @@ async function updateItem(itemId, updatedItem) {
   } 
 }
 
+async function deletePlayerItem(playerId, itemId) {
+  try {
+    const playerInventoryKey = `player_inventory:${playerId}`;
+    const itemKey = `item:${itemId}`;
+
+    const itemExists = await redisClient.zScore(playerInventoryKey, itemId);
+    if (!itemExists) {
+      return {
+        success: false,
+        message: `Item with ID ${itemId} does not exist in player ${playerId}'s inventory.`,
+      };
+    }
+
+    await redisClient.zRem(playerInventoryKey, itemId);
+    Logger.info(`Item with ID ${itemId} removed from player ${playerId}'s inventory.`);
+
+    const itemHashExists = await redisClient.exists(itemKey);
+    if (itemHashExists) {
+      await redisClient.del(itemKey);
+      Logger.info(`Item hash with ID ${itemId} deleted from Redis.`);
+    }
+
+    return {
+      success: true,
+      message: `Item with ID ${itemId} deleted from player ${playerId}'s inventory and Redis.`,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Error deleting item with ID ${itemId} from player ${playerId}'s inventory: ${error.message}`,
+      error: error,
+    };
+  }
+}
+
+
+async function addItemToPlayerInventory(playerId, itemId, quantity, itemDetails) {
+  try {
+    const playerInventoryKey = `player_inventory:${playerId}`;
+    const itemKey = `item:${itemId}`;
+
+    await redisClient.zAdd(playerInventoryKey, Date.now(), itemId);
+    Logger.info(`Item with ID ${itemId} added to player ${playerId}'s inventory.`);
+
+    if (itemDetails) {
+      const hashFields = {
+        'name': itemDetails.name,
+        'description': itemDetails.description,
+        'type': itemDetails.type,
+        'metadata': JSON.stringify(itemDetails.metadata),
+        'quantity': quantity,
+        'sellPrice': itemDetails.sellPrice,
+        'buyPrice': itemDetails.buyPrice,
+      };
+      await redisClient.hSet(itemKey, hashFields);
+      Logger.info(`Item details for ID ${itemId} stored in Redis.`);
+    }
+
+    return {
+      success: true,
+      message: `Item with ID ${itemId} added to player ${playerId}'s inventory.`,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Error adding item with ID ${itemId} to player ${playerId}'s inventory: ${error.message}`,
+      error: error,
+    };
+  }
+}
+
 
 module.exports = {
   redisClient,
@@ -132,5 +203,7 @@ module.exports = {
   prepareRedisData,
   saveItemsToRedis,
   getPlayerItems,
-  updateItem
+  updateItem,
+  deletePlayerItem,
+  addItemToPlayerInventory
 };

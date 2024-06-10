@@ -9,7 +9,16 @@ const { PlayerInventory, Item, Player } = require("../databases/postgreSQL/index
 const constant = require("../utils/constant.utils");
 const supporter = require("../utils/supporter.utils");
 const { pageableV2 } = require("../utils/pieces.utils");
-const { redisClient, parseRedisResult, prepareRedisData, saveItemsToRedis, getPlayerItems, updateItem } = require("../utils/redis");
+const {
+  redisClient,
+  parseRedisResult,
+  prepareRedisData,
+  saveItemsToRedis,
+  getPlayerItems,
+  updateItem,
+  deletePlayerItem,
+  addItemToPlayerInventory,
+} = require("../utils/redis");
 const { produceMessage, processTransactions } = require("../utils/kafka");
 const Logger = require("../utils/logger.utils");
 
@@ -190,7 +199,15 @@ module.exports = {
             player.coin += totalPrice;
             player.capacity += parseInt(data.quantity);
             playerInventory.quantity -= data.quantity;
-            playerInventory.save();
+            if (playerInventory.quantity > 0) {
+              playerInventory.save();
+              await updateItem(data.itemId, {
+                quantity: playerInventory.quantity,
+              });
+            } else {
+              await PlayerInventory.destroy({ where: { id: playerInventory.id } });
+              await deletePlayerItem(data.playerId, data.itemId);
+            }
             player.save();
 
             const transactionData = {
@@ -205,11 +222,9 @@ module.exports = {
               // dataChange: ItemData
             };
 
-            const updatedItemData = {
+            const newItemData = {
               quantity: playerInventory.quantity,
             };
-
-            await updateItem(data.itemId, updatedItemData);
 
             // await redisClient.set(transactionKey, JSON.stringify(transactionData));
 
@@ -267,6 +282,10 @@ module.exports = {
           try {
             data.buyPrice = result.buyPrice;
             data.sellPrice = result.sellPrice;
+            data.name = result.name;
+            data.description = result.description;
+            data.type = result.type;
+            data.metadata = result.metadata;
 
             const totalPrice = data.buyPrice * data.quantity;
 
@@ -290,19 +309,31 @@ module.exports = {
             if (playerInventory) {
               playerInventory.quantity += parseInt(data.quantity);
               playerInventory.save();
-            }else {
-             playerInventory = await PlayerInventory.create({
+              await updateItem(data.itemId, {
+                quantity: playerInventory.quantity,
+              });
+            } else {
+              playerInventory = await PlayerInventory.create({
                 playerId: data.playerId,
                 itemId: data.itemId,
                 quantity: data.quantity,
                 sellPrice: data.sellPrice,
                 createdBy: global.INFO.anonymousId,
-                updatedBy: global.INFO.anonymousId
+                updatedBy: global.INFO.anonymousId,
+              });
+              await addItemToPlayerInventory(data.playerId, data.itemId, data.quantity, {
+                name: data.name,
+                description: data.description,
+                type: data.type,
+                metadata: data.metadata,
+                quantity: data.quantity,
+                sellPrice: data.sellPrice,
+                buyPrice: data.buyPrice,
               });
             }
 
             // // Record transaction history
-            playerInventory.playerId = data.playerId
+            playerInventory.playerId = data.playerId;
             player.coin -= totalPrice;
             player.capacity -= parseInt(data.quantity);
             player.save();
@@ -319,11 +350,6 @@ module.exports = {
               // dataChange: ItemData
             };
 
-            const updatedItemData = {
-              quantity: playerInventory.quantity,
-            };
-
-            await updateItem(data.itemId, updatedItemData);
             // Produce Kafka message
             await produceMessage("inventory_updates", transactionData);
 
