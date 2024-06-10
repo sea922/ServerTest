@@ -30,11 +30,14 @@ services:
       PG_DB_PASSWORD: password
       PG_DB_DATABASE: game_item_management
       PG_DB_SCHEMA: game_server
+      POSTGRES_HOST_AUTH_METHOD: "trust"
     ports:
-      - "5432:5432"
+      - "2345:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
   nodejs_api:
-    image: technical-test
+    image: game_server
     container_name: nodejs_api
     ports:
       - "7000:7500"

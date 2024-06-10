@@ -24,7 +24,10 @@
         "PG_DB_SCHEMA": "game_server",
         "PG_DB_USERNAME": "postgres",
         "PG_DB_PASSWORD": "password",
-        "PG_DB_DIALECT": "postgres"
+        "PG_DB_DIALECT": "postgres",
+        "REDIS_HOST": "localhost",
+        "REDIS_PORT": "6379",
+        "BROKER_HOST": "localhost:9092"
       },
       "env_production": {
         "NODE_ENV": "production",
@@ -48,13 +51,16 @@
         "NODE_PORT": 7500,
         "API_ROOT_URL": "http://localhost:7500",
         "WEB_ROOT_URL": "",
-        "DB_HOST": "localhost",
-        "DB_PORT": "2345",
+        "PG_DB_HOST": "localhost",
+        "PG_DB_PORT": "2345",
         "PG_DB_DATABASE": "game_item_management",
         "PG_DB_SCHEMA": "game_server",
         "PG_DB_USERNAME": "postgres",
         "PG_DB_PASSWORD": "password",
-        "PG_DB_DIALECT": "postgres"
+        "PG_DB_DIALECT": "postgres",
+        "REDIS_HOST": "localhost",
+        "REDIS_PORT": "6379",
+        "BROKER_HOST": "localhost:9092"
       }
     }
   ]

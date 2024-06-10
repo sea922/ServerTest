@@ -140,9 +140,8 @@ module.exports = {
           );
         }
         const resData = {};
-        resData.playerInventoryId = result.id;
-        resData.item_id = result.item_id;
-        resData.player_id = result.player_id;
+        resData.item_id = result.itemId;
+        resData.player_id = result.playerId;
         resData.quantity = result.quantity;
         return rest.sendSuccessOne(res, resData, httpCode);
       }

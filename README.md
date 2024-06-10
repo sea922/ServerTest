@@ -44,7 +44,7 @@ yarn install
 
 Option 2:
 
-docker build -t <"name">
+`docker build -t <"name"> . `
 
 docker compose up
 
@@ -58,7 +58,7 @@ Run demo in your local machine.
 DB:Migration
 
 ```bash
-npm run migrate:up --development
+npm run migrate:up
 ```
 
 DB:Seed

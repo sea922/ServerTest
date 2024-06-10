@@ -57,7 +57,7 @@ const processTransactions = async () => {
                   createdAt: transactionData.timestamp,
               };
 
-              console.log(transactionData.dataChange);
+              // console.log(transactionData.dataChange);
 
               await TransactionHistory.create(
                 transactionBody,

@@ -13,7 +13,6 @@ const { redisClient, parseRedisResult, prepareRedisData, saveItemsToRedis, getPl
 const { produceMessage, processTransactions } = require("../utils/kafka");
 const Logger = require("../utils/logger.utils");
 
-
 module.exports = {
   getOneItemOfPlayer: async function (accessUserId, accessUserType, id, callback) {
     try {
@@ -143,8 +142,8 @@ module.exports = {
         data.quantity = body.quantity;
       }
 
-      if (!data.itemId || !body.quantity) {
-        return callback(1, "missing", 403, "Please provide itemId, and quantity", null);
+      if (!data.itemId || !body.quantity || body.quantity < 1) {
+        return callback(1, "missing", 403, "Please provide itemId, and quantity > 0", null);
       }
 
       async.waterfall([
@@ -244,8 +243,8 @@ module.exports = {
         data.quantity = parseInt(body.quantity);
       }
 
-      if (!data.itemId || !body.quantity) {
-        return callback(1, "missing", 403, "Please provide itemId, and quantity", null);
+      if (!data.itemId || !data.quantity || data.quantity < 1) {
+        return callback(1, "missing", 403, "Please provide itemId, and quantity > 0", null);
       }
 
       async.waterfall([
@@ -266,6 +265,7 @@ module.exports = {
         async function (result, cb) {
           try {
             data.buyPrice = result.buyPrice;
+            data.sellPrice = result.sellPrice;
 
             const totalPrice = data.buyPrice * data.quantity;
 
@@ -273,7 +273,7 @@ module.exports = {
             const player = await Player.findOne({
               where: {
                 id: data.playerId,
-                capacity: { [Sequelize.Op.gt]: data.quantity },
+                capacity: { [Sequelize.Op.gt]: parseInt(data.quantity) },
                 coin: { [Sequelize.Op.gte]: totalPrice },
               },
               attributes: ["id", "username", "coin", "capacity"],
@@ -282,39 +282,28 @@ module.exports = {
               return callback(1, "item_purchase_failed", 404, "Item purchase failed", null);
             }
 
-            const playerInventory = await PlayerInventory.findOne({
+            let playerInventory = await PlayerInventory.findOne({
               where: { playerId: data.playerId, itemId: data.itemId },
             });
 
-            if(!playerInventory) {
-              PlayerInventory.build({
+            if (playerInventory) {
+              playerInventory.quantity += parseInt(data.quantity);
+              playerInventory.save();
+            }else {
+             playerInventory = await PlayerInventory.create({
                 playerId: data.playerId,
                 itemId: data.itemId,
                 quantity: data.quantity,
+                sellPrice: data.sellPrice,
                 createdBy: global.INFO.anonymousId,
-                updatedBy: global.INFO.anonymousId,
-              })
-                .validate()
-                .then(function (item) {
-                  item
-                    .save({
-                      validate: false,
-                    })
-                    .then(function (result) {
-                      return callback(null, null, 200, null, result);
-                    })
-                    .catch(function (error) {
-                      console.log(error);
-                      return callback(true, "query_fail", 400, error, null);
-                    });
-                })
+                updatedBy: global.INFO.anonymousId
+              });
             }
 
-            // Record transaction history
+            // // Record transaction history
+            playerInventory.playerId = data.playerId
             player.coin -= totalPrice;
             player.capacity -= parseInt(data.quantity);
-            playerInventory.quantity += parseInt(data.quantity);
-            playerInventory.save();
             player.save();
 
             const transactionData = {
