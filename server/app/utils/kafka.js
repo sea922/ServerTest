@@ -54,6 +54,7 @@ const processTransactions = async () => {
                   quantityChange: transactionData.quantityChange,
                   previousQuantity: transactionData.previousQuantity,
                   currentQuantity: transactionData.currentQuantity,
+                  totalAmountChange: transactionData.totalAmountChange,
                   createdAt: transactionData.timestamp,
               };
 

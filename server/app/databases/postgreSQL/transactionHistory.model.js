@@ -36,7 +36,15 @@ module.exports = (database, DataTypes) => {
         type: DataTypes.BIGINT,
         allowNull: false,
       },
+      type: {
+        type: DataTypes.STRING(10),
+        allowNull: false,
+      },
       quantityChange: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      totalAmountChange: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
@@ -46,10 +54,6 @@ module.exports = (database, DataTypes) => {
       },
       currentQuantity: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      type: {
-        type: DataTypes.STRING(10),
         allowNull: false,
       },
       createdAt: {

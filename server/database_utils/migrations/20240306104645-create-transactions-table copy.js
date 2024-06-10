@@ -28,6 +28,10 @@ module.exports = {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,
       },
+      totalAmountChange: {
+        type: Sequelize.DataTypes.INTEGER,
+        allowNull: false,
+      },
       previousQuantity: {
         type: Sequelize.DataTypes.INTEGER,
         allowNull: false,

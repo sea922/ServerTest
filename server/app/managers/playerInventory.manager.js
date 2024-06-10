@@ -20,7 +20,7 @@ module.exports = {
         return callback(1, "permission_denied", 403, "permission denied", null);
       }
 
-      const key = `player_inventory:${accessUserId}`;
+      const key = `player_inventory:${accessUserId}:${id}`;
       let item = null;
 
       try {
@@ -200,6 +200,7 @@ module.exports = {
               quantityChange: data.quantity,
               previousQuantity: playerInventory.quantity + parseInt(data.quantity),
               currentQuantity: playerInventory.quantity,
+              totalAmountChange: totalPrice,
               timestamp: Date.now(),
               // dataChange: ItemData
             };
@@ -313,6 +314,7 @@ module.exports = {
               quantityChange: data.quantity,
               previousQuantity: playerInventory.quantity - parseInt(data.quantity),
               currentQuantity: playerInventory.quantity,
+              totalAmountChange: totalPrice,
               timestamp: Date.now(),
               // dataChange: ItemData
             };
