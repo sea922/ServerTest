@@ -28,7 +28,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:7500/api/v1/login",
+							"raw": "http://localhost:7000/api/v1/login",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -59,7 +59,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:7500/api/v1/auth/me",
+							"raw": "http://localhost:7000/api/v1/auth/me",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -103,7 +103,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:7500/api/v1/auth/players/2",
+							"raw": "http://localhost:7000/api/v1/auth/players/2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -145,7 +145,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:7500/api/v1/auth/players/16",
+							"raw": "http://localhost:7000/api/v1/auth/players/16",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -195,7 +195,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:7500/api/v1/auth/player-inventories",
+							"raw": "http://localhost:7000/api/v1/auth/player-inventories",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -239,7 +239,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:7500/api/v1/auth/player-inventories",
+							"raw": "http://localhost:7000/api/v1/auth/player-inventories",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -280,7 +280,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:7500/api/v1/auth/player-inventories/sell",
+							"raw": "http://localhost:7000/api/v1/auth/player-inventories/sell",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -322,7 +322,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:7500/api/v1/auth/player-inventories/buy",
+							"raw": "http://localhost:7000/api/v1/auth/player-inventories/buy",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -364,7 +364,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:7500/api/v1/auth/player-inventories/3",
+							"raw": "http://localhost:7000/api/v1/auth/player-inventories/3",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -411,7 +411,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:7500/api/v1/auth/items",
+							"raw": "http://localhost:7000/api/v1/auth/items",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -452,7 +452,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:7500/api/v1/auth/items/16",
+							"raw": "http://localhost:7000/api/v1/auth/items/16",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -497,7 +497,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:7500/api/v1/auth/items",
+							"raw": "http://localhost:7000/api/v1/auth/items",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -541,7 +541,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:7500/api/v1/auth/items/15",
+							"raw": "http://localhost:7000/api/v1/auth/items/15",
 							"protocol": "http",
 							"host": [
 								"localhost"

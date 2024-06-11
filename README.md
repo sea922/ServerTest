@@ -28,6 +28,85 @@ REST API
 Click [here](https://drive.google.com/file/d/19cVhdwCReszzvhj_RVhPevrKwyn4NbvB/view?usp=sharing) to view the demo.
 
 
+## Installation
+
+Clone this repository:
+
+```bash
+git https://github.com/sea922/ServerTest.git
+cd server
+```
+
+Option 1: Using docker (High recommend)
+(Please make sure you are in the "server" folder)
+
+`docker build -t game_server_test . `
+
+`docker compose up`
+
+(Please check containers and images have started yet!)
+![DB](/assets/Screenshot.png)
+
+
+<b style="color: yellow;">IF ERROR</b>
+
+```
+Dockerfile =>  # Change the exposed port at line EXPOSE 7500
+
+Dockerfile.pg =>  # Change the exposed port at line EXPOSE 5432
+
+docker-compose.yml # Change port exposed at line as container options error. Example:    ports: - "6379:6379"
+```
+
+
+
+Run demo in your local machine.
+
+
+Final Step:
+
+Open [http://localhost:7000](http://localhost:7000) => API
+
+You can import Postman Collection to testing this API
+
+#### Postman Collection:  
+
+[Open Collection Folder](./assets/Game_Server.postman_collection.json)
+
+![DB](/assets/Screenshot1.png)
+
+Option 2:
+
+Install the dependencies:
+
+```bash
+npm install
+```
+
+After
+
+Install the dependencies:
+
+```bash
+yarn install
+```
+
+
+DB:Migration
+
+```bash
+npm run migrate:up
+```
+
+DB:Seed
+
+```bash
+npx sequelize-cli db:seed:all
+```
+
+`npm run dev`
+
+
 
 # Solution
 
@@ -214,68 +293,6 @@ Delete item
 
 **Endpoint:** `/api/v1/auth/player-inventories/items/:id`
 
-
-
-## Installation
-
-Clone this repository:
-
-```bash
-git https://github.com/sea922/ServerTest.git
-cd server
-```
-
-Option 1:
-
-Install the dependencies:
-
-```bash
-npm install
-```
-
-After
-
-Install the dependencies:
-
-```bash
-yarn install
-```
-
-Option 2: Using docker
-
-`docker build -t <"name"> . `
-
-`docker compose up`
-
-
-
-## Demo
-
-Run demo in your local machine.
-
-
-DB:Migration
-
-```bash
-npm run migrate:up
-```
-
-DB:Seed
-
-```bash
-npx sequelize-cli db:seed:all
-```
-
-`npm run dev`
-
-
-Final Step:
-
-Open [http://localhost:7500](http://localhost:7500) => API
-
-#### Postman Collection:  
-
-[Open Collection Folder](./assets/Game_Server.postman_collection.json)
 
 
 

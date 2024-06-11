@@ -1,0 +1,17 @@
+FROM postgres:latest
+
+# Copy the entrypoint script into the container
+COPY init.sh /docker-entrypoint-initdb.d/init.sh
+
+# Set the script as executable
+RUN chmod +x /docker-entrypoint-initdb.d/init.sh
+
+
+# Expose PostgreSQL port
+EXPOSE 5432
+
+# Use the official entrypoint from the postgres image
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+# Run the init_db.sh script on container start
+CMD ["postgres"]

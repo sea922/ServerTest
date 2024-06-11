@@ -16,5 +16,5 @@ RUN npm install
 RUN npm install pm2 -g
 
 ########### Execute ############
-EXPOSE 7500 5443
-CMD [ "pm2-runtime", "process.json", "--env", "production" ]
+EXPOSE 7500
+CMD [ "pm2-runtime", "process.json", "--env", "development" ]
